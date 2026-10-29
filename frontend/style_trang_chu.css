@@ -1,0 +1,217 @@
+/* ===== CÀI ĐẶT CHUNG ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    display: flex;
+    background-color: #FAFAFA;
+    min-height: 100vh;
+    /* Đã gỡ lệnh cấm cuộn để lướt trang mượt mà */
+}
+
+/* Biến màu sắc toàn cục */
+:root {
+    --primary-color: #8B1E28; 
+    --hover-bg: #F2C7D4; 
+    --active-bg: #F0A0B8; /* Dải màu hồng đậm cho trang đang xem */
+    --sidebar-bg: #F8BACF; 
+    --border-color: #D67A8C; 
+}
+
+/* =========================================
+   1. SIDEBAR (THANH MENU BÊN TRÁI)
+========================================= */
+.sidebar {
+    width: 250px;
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+    z-index: 100;
+    
+    /* Bật tính năng lướt cho cột bên trái nếu màn hình thấp */
+    overflow-y: auto; 
+    scrollbar-width: none; /* Ẩn thanh cuộn cho đẹp */
+}
+.sidebar::-webkit-scrollbar { display: none; }
+
+/* Nút thu nhỏ menu (3 gạch) */
+.menu-toggle {
+    margin: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: var(--sidebar-bg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.menu-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* Danh sách Menu */
+.nav-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; 
+    margin-top: 10px;
+}
+
+.nav-item a {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px; 
+    text-decoration: none;
+    color: var(--primary-color);
+    font-family: 'Agbalumo', cursive;
+    font-size: 18px;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+/* Màu hover khi lướt chuột */
+.nav-item:hover a {
+    background-color: var(--hover-bg);
+}
+
+/* DẢI MÀU CHO TRANG HIỆN TẠI (ACTIVE) */
+.nav-item.active a {
+    background-color: var(--active-bg);
+    font-weight: bold;
+    border-right: 5px solid var(--primary-color);
+}
+
+/* Icon Menu */
+.nav-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* Nhóm menu dưới cùng */
+.bottom-menu {
+    margin-top: auto;
+    margin-bottom: 20px; 
+}
+
+/* HÌNH GẤU TRÚC (SỬA LỖI BIẾN MẤT) */
+.mascot-container {
+    position: relative; /* Trả về luồng hiển thị bình thường ở đáy menu */
+    padding-bottom: 15px; 
+    width: 100%;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.mascot-img {
+    width: 170px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* HIỆU ỨNG THU NHỎ SIDEBAR */
+.sidebar.collapsed { width: 80px; }
+.sidebar.collapsed .nav-text { display: none; }
+.sidebar.collapsed .nav-item a { justify-content: center; padding: 15px 0; }
+.sidebar.collapsed .nav-icon { margin-right: 0; }
+.sidebar.collapsed .mascot-container { opacity: 0; transform: translateY(20px); }
+
+/* =========================================
+   2. MAIN CONTENT (NỘI DUNG CHÍNH)
+========================================= */
+.main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 20px 40px;
+    transition: margin-left 0.3s, width 0.3s;
+}
+.main-content.expanded {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+}
+
+/* Header & Thanh tìm kiếm */
+.top-header { margin-bottom: 20px; }
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    padding: 12px 25px;
+    width: 100%;
+}
+.search-icon { width: 18px; height: 18px; margin-right: 15px; }
+.search-bar input { border: none; outline: none; width: 100%; font-size: 16px; color: #555; background: transparent; }
+.search-bar input::placeholder { color: #A1A1A1; }
+
+/* Vùng bọc nội dung (Khung viền) */
+.content-wrapper {
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    padding: 40px;
+    min-height: 80vh;
+}
+
+/* Danh sách nút thể loại (Pills) */
+.category-pills { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 40px; }
+.pill { padding: 10px 35px; border-radius: 20px; background-color: #D9D9D9; border: none; cursor: pointer; min-width: 120px; min-height: 40px; }
+.pill.active {
+    background: linear-gradient(180deg, #A7D3D9 0%, #CDE6E9 100%);
+    color: #FFFFFF;
+    font-family: 'Agbalumo', cursive;
+    font-size: 16px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Khu vực hiển thị sách */
+.book-section { margin-bottom: 40px; }
+.section-title { font-family: 'Agbalumo', cursive; color: var(--primary-color); font-size: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.book-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 35px; }
+.book-card { text-align: center; display: flex; flex-direction: column; align-items: center; }
+
+/* ẢNH BÌA SÁCH (ĐỌC ẢNH THẬT) */
+.book-cover-img {
+    width: 160px;
+    height: 240px;
+    object-fit: cover; /* Chỉnh kích thước cắt ảnh mượt mà */
+    border-radius: 5px;
+    box-shadow: -4px 4px 10px rgba(0,0,0,0.15); /* Bóng đổ cho sách */
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.book-cover-img:hover {
+    transform: translateY(-5px); /* Hiệu ứng đẩy lên khi trỏ chuột */
+}
+
+/* Xếp hạng sao và văn bản */
+.book-stars { display: flex; gap: 2px; margin-bottom: 5px; }
+.book-stars img { width: 14px; height: 14px; }
+.book-title { font-family: 'Agbalumo', cursive; color: var(--primary-color); font-size: 16px; margin-bottom: 3px; }
+.book-author { font-family: 'Agbalumo', cursive; color: var(--primary-color); font-size: 12px; }
+
+/* Thích ứng màn hình nhỏ */
+@media (max-width: 1200px) {
+    .book-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+    .book-grid { grid-template-columns: repeat(2, 1fr); }
+}

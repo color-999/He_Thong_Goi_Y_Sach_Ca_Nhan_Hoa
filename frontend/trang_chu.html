@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Hệ Thống Gợi Ý Sách</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style_trang_chu.css">
+</head>
+<body>
+
+    <!-- SIDEBAR BÊN TRÁI -->
+    <nav class="sidebar" id="sidebar">
+        <div class="menu-toggle" id="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-list">
+            <li class="nav-item active"><a href="trang_chu.html"><img src="icon/trang_chu.svg" class="nav-icon" alt="Trang chủ"><span class="nav-text">Trang chủ</span></a></li>
+            <li class="nav-item"><a href="danh_cho_bn.html"><img src="icon/danh_cho_bn.svg" class="nav-icon" alt="Dành cho bạn"><span class="nav-text">Dành cho bạn</span></a></li>
+            <li class="nav-item"><a href="lich_su_doc.html"><img src="icon/lich_su_doc.svg" class="nav-icon" alt="Lịch sử đọc"><span class="nav-text">Lịch sử đọc</span></a></li>
+            <li class="nav-item"><a href="yeu_thich.html"><img src="icon/book-heart.svg" class="nav-icon" alt="Yêu thích"><span class="nav-text">Yêu thích</span></a></li>
+            <li class="nav-item"><a href="cap_nhat_so_thich.html"><img src="icon/book-cap_nhat.svg" class="nav-icon" alt="Cập nhật sở thích"><span class="nav-text">Cập nhật sở thích</span></a></li>
+        </ul>
+
+        <div class="bottom-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="ho_so_ca_nhan.html"><img src="icon/card-outline.svg" class="nav-icon" alt="Hồ sơ cá nhân"><span class="nav-text">Hồ sơ cá nhân</span></a></li>
+                <li class="nav-item"><a href="login.html"><img src="icon/sign-out.svg" class="nav-icon" alt="Đăng xuất"><span class="nav-text">Đăng xuất.</span></a></li>
+            </ul>
+        </div>
+        <div class="mascot-container">
+            <img src="linh_vat_1.png" alt="Linh vật" class="mascot-img">
+        </div>
+    </nav>
+
+    <!-- NỘI DUNG CHÍNH BÊN PHẢI -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="search-bar">
+                <img src="icon/search.svg" class="search-icon" alt="Tìm kiếm">
+                <!-- Đã thêm id="top-search-input" -->
+                <input type="text" id="top-search-input" placeholder="Chào ngày mới! Hôm nay bạn muốn khám phá thế giới nào?">
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            
+            <!-- DANH SÁCH THỂ LOẠI -->
+            <div class="category-pills" id="category-container">
+                <button class="pill active" data-genre="Tất cả">Tất cả</button>
+                <button class="pill" data-genre="Lãng mạn">Lãng mạn</button>
+                <button class="pill" data-genre="Kỹ năng">Kỹ năng</button>
+                <button class="pill" data-genre="Giả tưởng / Phép thuật">Giả tưởng / Phép thuật</button>
+                <button class="pill" data-genre="Kinh doanh">Kinh doanh</button>
+                <button class="pill" data-genre="Khoa học viễn tưởng">Khoa học viễn tưởng</button>
+                <button class="pill" data-genre="Tâm lý">Tâm lý</button>
+                <button class="pill" data-genre="Trinh thám">Trinh thám</button>
+                <button class="pill" data-genre="Hồi ký">Hồi ký</button>
+                <button class="pill" data-genre="Kịch tính">Kịch tính</button>
+                <button class="pill" data-genre="Khoa học">Khoa học</button>
+                <button class="pill" data-genre="Kinh dị">Kinh dị</button>
+                <button class="pill" data-genre="Lịch sử">Lịch sử</button>
+                <button class="pill" data-genre="Phiêu lưu / Hành động">Phiêu lưu / Hành động</button>
+                <button class="pill" data-genre="Triết học">Triết học</button>
+                <button class="pill" data-genre="Tiểu thuyết lịch sử">Tiểu thuyết lịch sử</button>
+                <button class="pill" data-genre="Sức khỏe">Sức khỏe</button>
+                <button class="pill" data-genre="Tuổi teen">Tuổi teen</button>
+                <button class="pill" data-genre="Truyện tranh">Truyện tranh</button>
+            </div>
+
+            <!-- KHU VỰC 1: TOP THỊNH HÀNH -->
+            <section class="book-section">
+                <h2 class="section-title">
+                    <img src="icon/star.svg" alt="Sao" width="16"> Top thịnh hành
+                </h2>
+                <div class="book-grid" id="top-trending-grid">
+                    <p style="grid-column: 1/-1; text-align: center; color: #888;"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải sách từ cơ sở dữ liệu...</p>
+                </div>
+            </section>
+
+            <!-- KHU VỰC 2: MỚI CẬP NHẬT -->
+            <section class="book-section">
+                <h2 class="section-title">
+                    <img src="icon/star.svg" alt="Sao" width="16"> Mới cập nhật
+                </h2>
+                <div class="book-grid" id="new-update-grid">
+                    <p style="grid-column: 1/-1; text-align: center; color: #888;"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải sách từ cơ sở dữ liệu...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+        menuBtn.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); mainContent.classList.toggle('expanded'); });
+
+        let globalBooks = [];
+        let activeGenres = []; 
+
+        // HÀM VẼ SAO ĐỘNG
+        function generateStars(rating) {
+            let starsHTML = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = (rating - fullStars) >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - hasHalfStar;
+
+            for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fa-solid fa-star" style="color: #FFD700; font-size: 13px; margin-right: 2px;"></i>';
+            if (hasHalfStar) starsHTML += '<i class="fa-solid fa-star-half-stroke" style="color: #FFD700; font-size: 13px; margin-right: 2px;"></i>';
+            for (let i = 0; i < emptyStars; i++) starsHTML += '<i class="fa-regular fa-star" style="color: #FFD700; font-size: 13px; margin-right: 2px;"></i>';
+            return starsHTML;
+        }
+
+        function createBookCard(bookId, imgSrc, title, author, rating) {
+            return `
+                <a href="chi_tiet_sach.html?id=${encodeURIComponent(bookId)}" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="book-card">
+                        <img src="${imgSrc || 'bia_sach/bia_sach_chx_co.png'}" alt="${title}" class="book-cover-img" onerror="this.onerror=null;this.src='bia_sach/bia_sach_chx_co.png'">
+                        <div class="book-stars">${generateStars(rating)}</div>
+                        <h3 class="book-title" title="${title}">${title}</h3>
+                        <p class="book-author">${author}</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        // TẢI DỮ LIỆU TỪ API THẬT
+        async function fetchBooksFromDatabase() {
+            try {
+                const response = await fetch("http://localhost:8000/api/books");
+                const data = await response.json();
+                if(data.books) {
+                    globalBooks = data.books;
+                    applyFilters(); // Gọi hàm lọc tổng hợp
+                }
+            } catch (err) {
+                console.error("Lỗi kết nối API:", err);
+                document.getElementById('top-trending-grid').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: red;">Không thể kết nối máy chủ API!</p>';
+            }
+        }
+
+        // HÀM LỌC TỔNG HỢP (KẾT HỢP THỂ LOẠI VÀ TÌM KIẾM)
+        function applyFilters() {
+            const searchQuery = document.getElementById('top-search-input').value.toLowerCase().trim();
+            
+            let filtered = globalBooks;
+
+            // 1. Lọc theo thể loại
+            if (activeGenres.length > 0) {
+                filtered = filtered.filter(b => b.genres && b.genres.some(g => activeGenres.includes(g)));
+            }
+
+            // 2. Lọc theo từ khóa tìm kiếm (Tên sách hoặc Tác giả)
+            if (searchQuery) {
+                filtered = filtered.filter(b => 
+                    (b.title && b.title.toLowerCase().includes(searchQuery)) ||
+                    (b.authors && b.authors.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            renderBooksToGrids(filtered);
+        }
+
+        // HIỂN THỊ SÁCH LÊN 2 KHU VỰC
+        function renderBooksToGrids(books) {
+            const topGrid = document.getElementById('top-trending-grid');
+            const newGrid = document.getElementById('new-update-grid');
+
+            topGrid.innerHTML = '';
+            newGrid.innerHTML = '';
+
+            if (books.length === 0) {
+                topGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Không tìm thấy cuốn sách nào phù hợp!</p>';
+                return; // Chỉ cần hiện thông báo ở grid 1 là đủ
+            }
+
+            const topList = books.slice(0, 10);   
+            const newList = books.slice(10, 20);
+
+            topList.forEach(b => {
+                topGrid.innerHTML += createBookCard(b.book_id, b.cover_image, b.title, b.authors, b.rating);
+            });
+
+            newList.forEach(b => {
+                newGrid.innerHTML += createBookCard(b.book_id, b.cover_image, b.title, b.authors, b.rating);
+            });
+            
+            // Nếu danh sách mới cập nhật trống (do lọc ít kết quả), ẩn hoặc để trống đẹp hơn
+            if (newList.length === 0) newGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Không có thêm sách nào.</p>';
+        }
+
+        // XỬ LÝ SỰ KIỆN THANH TÌM KIẾM
+        document.getElementById('top-search-input').addEventListener('input', applyFilters);
+
+        // XỬ LÝ SỰ KIỆN CLICK PILLS (THỂ LOẠI)
+        const pills = document.querySelectorAll('.category-pills .pill');
+        const btnTatCa = pills[0];
+
+        pills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                const genre = this.getAttribute('data-genre');
+
+                if (genre === 'Tất cả') {
+                    pills.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                } else {
+                    btnTatCa.classList.remove('active');
+                    this.classList.toggle('active');
+
+                    const activePills = document.querySelectorAll('.category-pills .pill.active');
+                    if (activePills.length === 0) {
+                        btnTatCa.classList.add('active');
+                    }
+                }
+
+                activeGenres = Array.from(document.querySelectorAll('.category-pills .pill.active'))
+                                   .map(p => p.getAttribute('data-genre'))
+                                   .filter(g => g !== 'Tất cả');
+
+                applyFilters(); // Gọi hàm lọc tổng hợp
+            });
+        });
+
+        // Khởi chạy khi vào trang
+        fetchBooksFromDatabase();
+    </script>
+</body>
+</html>

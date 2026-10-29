@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Kí</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style_layout.css">
+</head>
+<body>
+    <div class="background-pink">
+        <div class="split-card">
+            <div class="card-left">
+                <img src="book.jpg" alt="Sách">
+            </div>
+            <div class="card-right">
+                <h1 class="title">ĐĂNG KÍ</h1>
+                
+                <form class="register-form">
+                    <div class="input-wrapper">
+                        <div class="input-group">
+                            <!-- Đã thêm id="reg_user" -->
+                            <input type="text" id="reg_user" placeholder="Nhập tên tài khoản" required>
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <div class="input-group">
+                            <input type="text" id="reg_contact" placeholder="Nhập số điện thoại / email của bạn (Tuỳ chọn)">
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <div class="input-group password-group">
+                            <!-- Đã thêm id="reg_pass" -->
+                            <input type="password" id="reg_pass" placeholder="Nhập mật khẩu" required>
+                            <button type="button" class="toggle-password">
+                                <img src="icon/Eye.svg" width="20" height="20">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <div class="input-group password-group">
+                            <!-- Đã thêm id="reg_pass_confirm" -->
+                            <input type="password" id="reg_pass_confirm" placeholder="Nhập lại mật khẩu" required>
+                            <button type="button" class="toggle-password">
+                                <img src="icon/Eye.svg" width="20" height="20">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="terms-group">
+                        <div class="custom-checkbox" id="terms-checkbox">
+                            <img src="icon/chx_chon_nhieu.svg" id="checkbox-img" width="18" height="18">
+                        </div>
+                        <p class="terms-text">Để bảo vệ tài khoản và tuân thủ quy định của pháp luật, bạn vui lòng đọc kỹ và xác nhận các điều khoản...</p>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="button" class="btn-back" onclick="window.location.href='login.html'">Quay lại</button>
+                        <!-- Đổi type="submit" thành type="button" và thêm id="btnRegister" -->
+                        <button type="button" id="btnRegister" class="btn-submit" style="flex: 1; margin: 0; padding: 12px 0;">ĐĂNG KÍ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="footer-text">Mỗi trang sách, một thế giới mới ✿</div>
+    </div>
+    
+    <script>
+        // --- 1. XỬ LÝ ẨN/HIỆN MẬT KHẨU ---
+        const toggleBtns = document.querySelectorAll('.toggle-password');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const pwdInput = this.parentElement.querySelector('input');
+                const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                pwdInput.setAttribute('type', type);
+                
+                this.querySelector('img').src = type === 'text' ? 'icon/Eye off.svg' : 'icon/Eye.svg';
+            });
+        });
+        
+        // --- 2. XỬ LÝ NÚT CHECKBOX ---
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const checkboxImg = document.getElementById('checkbox-img');
+        let isChecked = false;
+        termsCheckbox.addEventListener('click', function() {
+            isChecked = !isChecked;
+            checkboxImg.src = isChecked ? 'icon/chon_nhieu.svg' : 'icon/chx_chon_nhieu.svg';
+        });
+
+        // --- 3. XỬ LÝ GỌI API ĐĂNG KÝ ---
+        const btnRegister = document.getElementById('btnRegister');
+        const userInp = document.getElementById('reg_user');
+        const passInp = document.getElementById('reg_pass');
+        const passConfirmInp = document.getElementById('reg_pass_confirm');
+
+        btnRegister.addEventListener('click', async function() {
+            if (!isChecked) {
+                alert("❌ Bạn phải đồng ý với Điều khoản sử dụng!");
+                return;
+            }
+
+            const username = userInp.value.trim();
+            const password = passInp.value.trim();
+            const passwordConfirm = passConfirmInp.value.trim();
+
+            if (!username || !password || !passwordConfirm) {
+                alert("❌ Vui lòng điền đủ thông tin tài khoản và mật khẩu!");
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                alert("❌ Mật khẩu nhập lại không khớp!");
+                return;
+            }
+
+            btnRegister.innerText = "ĐANG TẠO...";
+            
+            try {
+                const response = await fetch("http://localhost:8000/api/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("❌ Lỗi: " + data.error);
+                } else {
+                    alert("✅ Đăng ký thành công! Đăng nhập để tiếp tục tìm cuốn sách hay nhé.");
+                    window.location.href = 'login.html'; // Tự chuyển về trang đăng nhập
+                }
+            } catch (error) {
+                alert("❌ Lỗi kết nối máy chủ API!");
+            } finally {
+                btnRegister.innerText = "ĐĂNG KÍ";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Lại Mật Khẩu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style_layout.css">
+</head>
+<body>
+    <div class="background-pink">
+        <div class="split-card">
+            <div class="card-left">
+                <img src="book.jpg" alt="Sách">
+            </div>
+            <div class="card-right">
+                <h1 class="title">QUÊN MẬT KHẨU</h1>
+                
+                <form class="reset-password-form">
+                    <div class="input-wrapper">
+                        <div class="input-group password-group">
+                            <input type="password" placeholder="Nhập mật khẩu mới" required>
+                            <button type="button" class="toggle-password">
+                                <img src="icon/Eye.svg" width="20" height="20">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <div class="input-group password-group">
+                            <input type="password" placeholder="Nhập lại mật khẩu mới" required>
+                            <button type="button" class="toggle-password">
+                                <img src="icon/Eye.svg" width="20" height="20">
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-container">
+                        <button type="button" class="btn-continue" onclick="window.location.href='login.html'">Tiếp tục</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="footer-text">Mỗi trang sách, một thế giới mới ✿</div>
+    </div>
+    <script>
+        const toggleBtns = document.querySelectorAll('.toggle-password');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const pwdInput = this.parentElement.querySelector('input');
+                const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                pwdInput.setAttribute('type', type);
+                this.querySelector('img').src = type === 'text' ? 'icon/Eye off.svg' : 'icon/Eye.svg';
+            });
+        });
+    </script>
+</body>
+</html>

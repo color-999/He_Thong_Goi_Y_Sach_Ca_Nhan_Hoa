@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập Nhật Sở Thích - Gợi Ý Sách</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style_trang_chu.css">
+
+    <style>
+        .preferences-header { text-align: center; margin-bottom: 30px; }
+        
+        /* Tiêu đề từng phần */
+        .pref-section-title {
+            font-family: 'Agbalumo', cursive;
+            color: var(--primary-color);
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed #F2C7D4;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* Lưới nút bấm */
+        .genre-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; }
+        .genre-btn { padding: 12px 20px; border-radius: 25px; background-color: #F8FAFC; border: 2px solid #E2E8F0; color: #475569; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; user-select: none; }
+        .genre-btn:hover { background-color: #F1F5F9; transform: translateY(-2px); }
+        .genre-btn.active { background-color: #FDF0F0; border-color: #DF6B8A; color: #DF6B8A; box-shadow: 0 4px 10px rgba(223, 107, 138, 0.2); }
+
+        /* Khung nhập 3 cuốn sách */
+        .book-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 600px;
+        }
+        .book-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .book-input-wrapper i {
+            position: absolute;
+            left: 15px;
+            color: #DF6B8A;
+            font-size: 18px;
+        }
+        .book-input-wrapper input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #E2E8F0;
+            border-radius: 15px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+            background: #FAFAFA;
+        }
+        .book-input-wrapper input:focus {
+            border-color: #DF6B8A;
+            background: #FFF;
+            box-shadow: 0 4px 10px rgba(223, 107, 138, 0.1);
+        }
+
+        /* Nút lưu */
+        .btn-save-container { text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px dashed #E2E8F0; }
+        .btn-save-prefs { background-color: var(--primary-color); color: #FFF; border: none; padding: 15px 50px; border-radius: 30px; font-family: 'Agbalumo', cursive; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(139, 30, 40, 0.2); display: inline-flex; align-items: center; gap: 10px; }
+        .btn-save-prefs:hover { background-color: #6e161f; transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR BÊN TRÁI -->
+    <nav class="sidebar" id="sidebar">
+        <div class="menu-toggle" id="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-list">
+            <li class="nav-item"><a href="trang_chu.html"><img src="icon/trang_chu.svg" class="nav-icon" alt="Trang chủ"><span class="nav-text">Trang chủ</span></a></li>
+            <li class="nav-item"><a href="danh_cho_bn.html"><img src="icon/danh_cho_bn.svg" class="nav-icon" alt="Dành cho bạn"><span class="nav-text">Dành cho bạn</span></a></li>
+            <li class="nav-item"><a href="lich_su_doc.html"><img src="icon/lich_su_doc.svg" class="nav-icon" alt="Lịch sử đọc"><span class="nav-text">Lịch sử đọc</span></a></li>
+            <li class="nav-item"><a href="yeu_thich.html"><img src="icon/book-heart.svg" class="nav-icon" alt="Yêu thích"><span class="nav-text">Yêu thích</span></a></li>
+            <li class="nav-item active"><a href="cap_nhat_so_thich.html"><img src="icon/book-cap_nhat.svg" class="nav-icon" alt="Cập nhật sở thích"><span class="nav-text">Cập nhật sở thích</span></a></li>
+        </ul>
+        <div class="bottom-menu">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="ho_so_ca_nhan.html"><img src="icon/card-outline.svg" class="nav-icon" alt="Hồ sơ cá nhân"><span class="nav-text">Hồ sơ cá nhân</span></a></li>
+                <li class="nav-item"><a href="login.html"><img src="icon/sign-out.svg" class="nav-icon" alt="Đăng xuất"><span class="nav-text">Đăng xuất.</span></a></li>
+            </ul>
+        </div>
+        <div class="mascot-container">
+            <img src="linh_vat_1.png" alt="Linh vật" class="mascot-img">
+        </div>
+    </nav>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="main-content">
+        <header class="top-header">
+            <h1 style="font-family: 'Agbalumo', cursive; color: var(--primary-color);">Hồ Sơ Sở Thích AI</h1>
+        </header>
+
+        <div class="content-wrapper">
+            
+            <div class="preferences-header">
+                <h2 style="font-size: 22px; color: #333; margin-bottom: 10px;">Hệ thống AI cần hiểu rõ bạn hơn!</h2>
+                <p style="color: #666; font-size: 15px;">Hãy cung cấp các thông tin dưới đây để chúng tôi tạo ra không gian đọc dành riêng cho bạn.</p>
+            </div>
+
+            <!-- PHẦN 1: THỂ LOẠI -->
+            <div class="pref-section-title"><i class="fa-solid fa-tags"></i> 1. Thể loại bạn yêu thích (Chọn ít nhất 3)</div>
+            <div class="genre-grid" id="genreContainer"></div>
+
+            <!-- PHẦN 2: TÁC GIẢ -->
+            <div class="pref-section-title"><i class="fa-solid fa-pen-nib"></i> 2. Tác giả bạn quan tâm</div>
+            <div class="genre-grid" id="authorContainer"></div>
+
+            <!-- PHẦN 3: 3 CUỐN SÁCH TÂM ĐẮC -->
+            <div class="pref-section-title"><i class="fa-solid fa-book-bookmark"></i> 3. Ba cuốn sách bạn từng đọc và tâm đắc nhất</div>
+            <p style="color: #888; font-size: 13px; margin-bottom: 15px; margin-top: -10px;">Nhập đúng tên sách sẽ giúp AI quét ma trận nội dung (TF-IDF) chính xác hơn.</p>
+            
+            <div class="book-input-group">
+                <div class="book-input-wrapper">
+                    <i class="fa-solid fa-1"></i>
+                    <input type="text" id="favBook1" placeholder="Ví dụ: Harry Potter và Hòn đá phù thủy...">
+                </div>
+                <div class="book-input-wrapper">
+                    <i class="fa-solid fa-2"></i>
+                    <input type="text" id="favBook2" placeholder="Ví dụ: Nhà giả kim...">
+                </div>
+                <div class="book-input-wrapper">
+                    <i class="fa-solid fa-3"></i>
+                    <input type="text" id="favBook3" placeholder="Ví dụ: Ghi chép pháp y...">
+                </div>
+            </div>
+
+            <!-- NÚT LƯU -->
+            <div class="btn-save-container">
+                <button class="btn-save-prefs" id="btnSavePrefs">
+                    <i class="fa-solid fa-floppy-disk"></i> CẬP NHẬT SỞ THÍCH 
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const menuBtn=document.getElementById('menu-btn'), sidebar=document.getElementById('sidebar'), mainContent=document.querySelector('.main-content');
+        if(menuBtn) menuBtn.addEventListener('click',()=>{sidebar.classList.toggle('collapsed');mainContent.classList.toggle('expanded');});
+        const userId=localStorage.getItem('user_id');
+        if(!userId){alert('Vui lòng đăng nhập để cập nhật sở thích!');window.location.href='login.html';}
+        const allGenres=['Lãng mạn','Kỹ năng','Giả tưởng','Phép thuật','Kinh doanh','Khoa học viễn tưởng','Tâm lý','Trinh thám','Hồi ký','Kịch tính','Khoa học','Kinh dị','Lịch sử','Phiêu lưu','Triết học','Sức khỏe','Tuổi teen','Truyện tranh'];
+        const popularAuthors=['J.K. Rowling','Paulo Coelho','Dan Brown','Agatha Christie','Higashino Keigo','Nguyễn Nhật Ánh','Dale Carnegie','Haruki Murakami','Thích Nhất Hạnh','Pháp y Tần Minh','Stephen King'];
+        function safeParse(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
+        let savedProfile=safeParse('ai_user_profile',{genres:safeParse('user_genres',[]),authors:safeParse('user_authors',[]),books:safeParse('user_top_books',['','',''])});
+        function renderPills(containerId,dataList,savedList,itemType){const container=document.getElementById(containerId);if(!container)return;container.innerHTML='';dataList.forEach(item=>{const btn=document.createElement('button');btn.className='genre-btn';btn.innerText=item;btn.dataset.type=itemType;if((savedList||[]).includes(item))btn.classList.add('active');btn.addEventListener('click',()=>btn.classList.toggle('active'));container.appendChild(btn);});}
+        renderPills('genreContainer',allGenres,savedProfile.genres||[],'genre');
+        renderPills('authorContainer',popularAuthors,savedProfile.authors||[],'author');
+        document.getElementById('favBook1').value=(savedProfile.books||[])[0]||'';
+        document.getElementById('favBook2').value=(savedProfile.books||[])[1]||'';
+        document.getElementById('favBook3').value=(savedProfile.books||[])[2]||'';
+        document.getElementById('btnSavePrefs').addEventListener('click',async function(){
+            const selectedGenres=Array.from(document.querySelectorAll('.genre-btn.active[data-type="genre"]')).map(b=>b.innerText.trim());
+            const selectedAuthors=Array.from(document.querySelectorAll('.genre-btn.active[data-type="author"]')).map(b=>b.innerText.trim());
+            const books=[document.getElementById('favBook1').value.trim(),document.getElementById('favBook2').value.trim(),document.getElementById('favBook3').value.trim()].filter(Boolean);
+            if(selectedGenres.length<3){alert('Bạn hãy chọn ít nhất 3 thể loại.');return;}
+            const profile={user_id:userId,genres:selectedGenres,authors:selectedAuthors,books,profile_source:'updated'};
+            const btn=this, original=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> ĐANG LƯU HỒ SƠ...';
+            try{
+                const response=await fetch('http://localhost:8000/api/user/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(profile)});
+                const data=await response.json();if(!response.ok||data.error||data.detail)throw new Error(data.detail||data.error||'Lưu hồ sơ thất bại');
+                // Cập nhật cache đồng bộ để trang khác đọc đúng hồ sơ mới nhất.
+                localStorage.setItem('ai_user_profile',JSON.stringify({genres:selectedGenres,authors:selectedAuthors,books,profile_source:'updated'}));
+                localStorage.setItem('user_genres',JSON.stringify(selectedGenres));localStorage.setItem('user_authors',JSON.stringify(selectedAuthors));
+                localStorage.setItem('user_top_books',JSON.stringify(books));localStorage.setItem('preference_profile_source','updated');
+                btn.innerHTML='<i class="fa-solid fa-check"></i> ĐÃ CẬP NHẬT AI';
+                alert('Đã cập nhật sở thích lên máy chủ. Trang Dành cho bạn sẽ tải hồ sơ mới này và tạo gợi ý lại.');
+                window.location.href='danh_cho_bn.html';
+            }catch(err){alert('Không thể lưu sở thích: '+err.message+'\nKiểm tra API đang chạy rồi thử lại.');}
+            finally{btn.disabled=false;btn.innerHTML=original;}
+        });
+    </script>
+</body>
+</html>

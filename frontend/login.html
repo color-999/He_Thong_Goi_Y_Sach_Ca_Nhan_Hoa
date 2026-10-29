@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style_layout.css">
+</head>
+<body>
+    <div class="background-pink">
+        <div class="split-card">
+            <div class="card-left">
+                <img src="book.jpg" alt="Sách">
+            </div>
+            <div class="card-right">
+                <h1 class="title">ĐĂNG NHẬP</h1>
+                <p class="subtitle">Cuộc sống sẽ trở nên phong phú hơn khi có suwh hiện diện của những cuốn sách bên cạnh - "Henry David Thoreau"</p>
+                
+                <!-- Thêm autocomplete="off" để trình duyệt không tự động điền tài khoản cũ -->
+                <form class="login-form" autocomplete="off">
+                    <div class="input-wrapper">
+                        <label class="input-label">Tên đăng nhập</label>
+                        <div class="input-group">
+                            <input type="text" id="login_user" placeholder="Nhập tên đăng nhập của bạn" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <label class="input-label">Mật khẩu</label>
+                        <div class="input-group password-group">
+                            <input type="password" id="login_pass" placeholder="Nhập mật khẩu" required autocomplete="new-password">
+                            <button type="button" class="toggle-password">
+                                <img src="icon/Eye.svg" alt="Hiện mật khẩu" width="20" height="20">
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="quen_mk.html" class="forgot-password">Quên mật khẩu?</a>
+                    
+                    <div class="btn-container">
+                        <button type="button" id="btnLogin" class="btn-submit">ĐĂNG NHẬP</button>
+                    </div>
+                    
+                    <div class="register-link">
+                        <p>Bạn chưa có tài khoản?</p>
+                        <a href="dang_ki.html" class="register-text">ĐĂNG KÍ NGAY</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="footer-text">Mỗi trang sách, một thế giới mới ✿</div>
+    </div>
+    <script>
+        // Đảm bảo form luôn trống khi vừa vào trang
+        window.addEventListener('load', () => {
+            document.getElementById('login_user').value = '';
+            document.getElementById('login_pass').value = '';
+        });
+
+        // --- 1. XỬ LÝ ẨN/HIỆN MẬT KHẨU ---
+        const togglePassword = document.querySelector('.toggle-password');
+        const passwordInput = document.getElementById('login_pass');
+        const eyeIcon = togglePassword.querySelector('img');
+        
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            eyeIcon.src = type === 'text' ? 'icon/Eye off.svg' : 'icon/Eye.svg';
+        });
+
+        // --- 2. XỬ LÝ GỌI API ĐĂNG NHẬP ---
+        const btnLogin = document.getElementById('btnLogin');
+        const usernameInput = document.getElementById('login_user');
+
+        btnLogin.addEventListener('click', async function() {
+            const user = usernameInput.value.trim();
+            const pass = passwordInput.value.trim();
+
+            if (!user || !pass) {
+                alert("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
+                return;
+            }
+
+            btnLogin.innerText = "ĐANG XỬ LÝ...";
+            
+            try {
+                // 1. GỌI API ĐĂNG NHẬP
+                const response = await fetch("http://localhost:8000/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("❌ Lỗi: " + data.error);
+                } else {
+                    // ========================================================
+                    // SỬA LỖI TẠI ĐÂY: DÙNG CLEAR() ĐỂ XÓA SẠCH 100% BỘ NHỚ TẠM
+                    // ========================================================
+                    localStorage.clear(); 
+                    sessionStorage.clear();
+                    // ========================================================
+
+                    // Lưu thông tin đăng nhập mới
+                    localStorage.setItem("user_id", data.user_id);
+                    localStorage.setItem("username", data.username);
+                    localStorage.setItem("role", data.role);
+                    
+                    // Cảnh báo kiểm tra (nếu cần gỡ lỗi)
+                    console.log("Đăng nhập thành công với ID:", data.user_id, "- Tên:", data.username);
+                    
+                    alert(`Đăng nhập thành công! Xin chào ${data.username}`); 
+                    
+                    // 2. RẼ NHÁNH KIỂM TRA QUYỀN VÀ KHẢO SÁT
+                    if (data.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        // Gọi API kiểm tra tình trạng khảo sát của tài khoản mới
+                        const prefRes = await fetch("http://localhost:8000/api/user/preferences/" + data.user_id);
+                        const prefData = await prefRes.json();
+                        
+                        if (prefData.has_preferences === true) {
+                            window.location.href = 'trang_chu.html'; // Đã làm khảo sát -> Trang chính
+                        } else {
+                            window.location.href = 'khao_sat.html'; // Chưa làm -> Trang khảo sát
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(error); 
+                alert("❌ Đã xảy ra lỗi kết nối! Vui lòng kiểm tra lại Uvicorn.");
+            } finally {
+                btnLogin.innerText = "ĐĂNG NHẬP";
+            }
+        });
+    </script>
+</body>
+</html>

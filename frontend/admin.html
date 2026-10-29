@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Trị Hệ Thống - Gợi Ý Sách</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style_admin.css">
+</head>
+<body>
+
+    <!-- SIDEBAR BÊN TRÁI -->
+    <nav class="sidebar" id="sidebar">
+        <div class="menu-toggle" id="menu-btn">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item active">
+                <a href="#dashboard">
+                    <i class="fa-solid fa-chart-pie nav-icon"></i>
+                    <span class="nav-text">Tổng quan</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#quan-ly-sach">
+                    <i class="fa-solid fa-book-open nav-icon"></i>
+                    <span class="nav-text">Quản lý sách</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#quan-ly-user">
+                    <i class="fa-solid fa-users nav-icon"></i>
+                    <span class="nav-text">Quản lý người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#cap-nhat-mo-hinh">
+                    <i class="fa-solid fa-brain nav-icon"></i>
+                    <span class="nav-text">Cập nhật mô hình</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="bottom-menu">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="login.html">
+                        <i class="fa-solid fa-right-from-bracket nav-icon"></i>
+                        <span class="nav-text">Đăng xuất</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="main-content">
+        
+        <header class="top-header">
+            <h1 class="admin-title">BẢNG ĐIỀU KHIỂN QUẢN TRỊ</h1>
+            <div class="admin-profile">
+                <span>Chào, Admin</span>
+                <i class="fa-solid fa-circle-user profile-icon"></i>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            
+            <!-- THẺ THỐNG KÊ (DASHBOARD) -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-users stat-icon"></i>
+                    <div class="stat-info">
+                        <h3>Tổng Người Dùng</h3>
+                        <p>1,245</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-book stat-icon"></i>
+                    <div class="stat-info">
+                        <h3>Tổng Số Sách</h3>
+                        <p>8,430</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-bullseye stat-icon"></i>
+                    <div class="stat-info">
+                        <h3>Độ Chính Xác (RMSE)</h3>
+                        <p>0.84</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. QUẢN LÝ SÁCH -->
+            <section class="admin-section" id="quan-ly-sach">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fa-solid fa-book-open"></i> Quản Lý Danh Mục Sách</h2>
+                    <button class="btn-action btn-add"><i class="fa-solid fa-plus"></i> Thêm sách mới</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Bìa</th>
+                                <th>Tên sách</th>
+                                <th>Tác giả</th>
+                                <th>Thể loại</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#BK001</td>
+                                <td><img src="bia_sach/Harry_Potter_1.jfif" alt="Bìa" class="table-img"></td>
+                                <td>Harry Potter và Hòn Đá Phù Thủy</td>
+                                <td>J.K. Rowling</td>
+                                <td>Giả tưởng</td>
+                                <td>
+                                    <button class="btn-icon edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#BK002</td>
+                                <td><img src="bia_sach/bia_sach_chx_co.png" alt="Bìa" class="table-img"></td>
+                                <td>Nhà Giả Kim</td>
+                                <td>Paulo Coelho</td>
+                                <td>Triết học</td>
+                                <td>
+                                    <button class="btn-icon edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 2. QUẢN LÝ NGƯỜI DÙNG -->
+            <section class="admin-section" id="quan-ly-user">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fa-solid fa-users"></i> Quản Lý Người Dùng</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên tài khoản</th>
+                                <th>Đã khảo sát</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#US102</td>
+                                <td>nguyenvana_99</td>
+                                <td><span class="badge success">Đã hoàn thành</span></td>
+                                <td>Hoạt động</td>
+                                <td>
+                                    <button class="btn-action btn-danger">Khóa TK</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#US103</td>
+                                <td>yeudocsach_01</td>
+                                <td><span class="badge warning">Chưa hoàn thành</span></td>
+                                <td>Hoạt động</td>
+                                <td>
+                                    <button class="btn-action btn-danger">Khóa TK</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. CẬP NHẬT MÔ HÌNH -->
+            <section class="admin-section" id="cap-nhat-mo-hinh">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fa-solid fa-brain"></i> Huấn Luyện & Cập Nhật Mô Hình</h2>
+                </div>
+                
+                <div class="model-container">
+                    <div class="model-info">
+                        <p><strong>Thuật toán đang sử dụng:</strong> SVD (Singular Value Decomposition)</p>
+                        <p><strong>Lần huấn luyện cuối:</strong> 16/10/2026 - 02:30 AM</p>
+                        <p><strong>Dữ liệu:</strong> 12,500 lượt đánh giá mới chưa được đưa vào mô hình.</p>
+                        
+                        <div class="metrics-box">
+                            <div class="metric">
+                                <span>RMSE (Root Mean Square Error):</span>
+                                <strong>0.8412</strong>
+                            </div>
+                            <div class="metric">
+                                <span>MAE (Mean Absolute Error):</span>
+                                <strong>0.6321</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="model-action">
+                        <button class="btn-update-model" id="btnRetrain">
+                            <i class="fa-solid fa-gears"></i> BẮT ĐẦU HUẤN LUYỆN LẠI
+                        </button>
+                        <p class="warning-text">* Quá trình này có thể mất vài phút tùy thuộc vào lượng dữ liệu mới.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+        
+        <!-- KHUNG POPUP (MODAL) THÊM SÁCH MỚI -->
+        <div id="addBookModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fa-solid fa-plus-circle"></i> Thêm Sách Mới</h2>
+                    <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form class="modal-form">
+                    <div class="form-group">
+                        <label>Tên sách</label>
+                        <input type="text" placeholder="Nhập tên sách..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tác giả</label>
+                        <input type="text" placeholder="Nhập tên tác giả..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Thể loại</label>
+                        <select required>
+                            <option value="">-- Chọn thể loại --</option>
+                            <option value="hanhdong">Hành động</option>
+                            <option value="giatuong">Giả tưởng</option>
+                            <option value="kinhdi">Kinh dị</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh bìa</label>
+                        <input type="file" accept="image/*">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-cancel">Hủy</button>
+                        <button type="submit" class="btn-save">Lưu Sách</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+<script>
+                // 0. LẤY THÔNG TIN ADMIN TỪ localStorage (được lưu khi đăng nhập thành công)
+        //    Hỗ trợ nhiều key để tương thích với các phiên bản login.html khác nhau.
+        const ADMIN_ID   = (localStorage.getItem('user_id') || '').trim();
+        const ADMIN_ROLE = (localStorage.getItem('role')    || '').toLowerCase().trim();
+
+        // Chặn truy cập nếu không phải admin
+        if (!ADMIN_ID || ADMIN_ROLE !== 'admin') {
+            alert('Bạn cần đăng nhập bằng tài khoản quản trị để vào trang này.');
+            window.location.href = 'login.html';
+        }
+
+        // Helper: gọi API admin kèm header X-User-Id
+        function adminFetch(url, options = {}) {
+            const headers = Object.assign(
+                { 'X-User-Id': ADMIN_ID },
+                options.headers || {}
+            );
+            return fetch(url, { ...options, headers });
+        }
+
+        // 1. XỬ LÝ SIDEBAR THU PHÓNG
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        menuBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // 2. XỬ LÝ CHUYỂN TAB TRONG ADMIN
+        const navItems = document.querySelectorAll('.sidebar .nav-list .nav-item a[href^="#"]');
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                navItems.forEach(nav => nav.parentElement.classList.remove('active'));
+                this.parentElement.classList.add('active');
+
+                const targetId = this.getAttribute('href').substring(1);
+                if (targetId === 'dashboard') {
+                    document.querySelector('.stats-grid').style.display = 'grid';
+                    document.querySelectorAll('.admin-section').forEach(sec => sec.style.display = 'none');
+                } else {
+                    document.querySelector('.stats-grid').style.display = 'none';
+                    document.querySelectorAll('.admin-section').forEach(sec => sec.style.display = 'none');
+                    const targetSec = document.getElementById(targetId);
+                    if(targetSec) targetSec.style.display = 'block';
+                }
+            });
+        });
+        if(navItems.length > 0) navItems[0].click();
+
+        // 3. TẢI DỮ LIỆU THỐNG KÊ VÀ DANH SÁCH THẬT CHO ADMIN
+        async function loadAdminData() {
+            try {
+                // Tải thống kê Dashboard (BẮT BUỘC kèm X-User-Id)
+                const resStats = await adminFetch('http://localhost:8000/api/admin/stats');
+                if (!resStats.ok) {
+                    console.warn(`API /api/admin/stats trả ${resStats.status}. Kiểm tra đăng nhập admin.`);
+                } else {
+                    const stats = await resStats.json();
+                    if (!stats.error) {
+                        const statCards = document.querySelectorAll('.stat-card p');
+                        if (statCards.length >= 2) {
+                            statCards[0].innerText = Number(stats.total_users).toLocaleString();
+                            statCards[1].innerText = Number(stats.total_books).toLocaleString();
+                        }
+                    }
+                }
+
+                // Tải danh sách sách thực tế (endpoint công khai, không cần header)
+                const resBooks = await fetch('http://localhost:8000/api/books');
+                const dataBooks = await resBooks.json();
+                if(dataBooks.books) {
+                    const tbodyBook = document.querySelector('#quan-ly-sach tbody');
+                    if(tbodyBook) {
+                        tbodyBook.innerHTML = '';
+                        dataBooks.books.forEach((b, index) => {
+                            tbodyBook.innerHTML += `
+                                <tr>
+                                    <td>#BK${b.book_id}</td>
+                                    <td><img src="${b.cover_image}" alt="Bìa" class="table-img" onerror="this.src='bia_sach/bia_sach_chx_co.png'"></td>
+                                    <td>${b.title}</td>
+                                    <td>${b.authors}</td>
+                                    <td>${b.genres ? b.genres.join(', ') : 'Chưa rõ'}</td>
+                                    <td>
+                                        <button class="btn-icon edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                }
+
+                 // Tải danh sách người dùng thực tế (BẮT BUỘC kèm X-User-Id)
+                const resUsers = await adminFetch('http://localhost:8000/api/admin/users');
+                if (!resUsers.ok) {
+                    console.warn(`API /api/admin/users trả ${resUsers.status}. Kiểm tra đăng nhập admin.`);
+                } else {
+                    const dataUsers = await resUsers.json();
+                    if (dataUsers.users) {
+                        const tbodyUser = document.querySelector('#quan-ly-user tbody');
+                        if (tbodyUser) {
+                            tbodyUser.innerHTML = '';
+                            dataUsers.users.forEach((u) => {
+                                const badgeClass = u.survey_completed ? 'success' : 'warning';
+                                const badgeText = u.survey_completed ? 'Đã hoàn thành' : 'Chưa hoàn thành';
+                                tbodyUser.innerHTML += `
+                                    <tr>
+                                        <td>#US_${String(u.user_id).substring(0,6)}</td>
+                                        <td>${u.username} (${u.role})</td>
+                                        <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                                        <td>Hoạt động</td>
+                                        <td>
+                                            <button class="btn-action btn-danger" onclick="alert('Tính năng khóa tài khoản đang phát triển')">Khóa TK</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                        }
+                    }
+                }
+
+            } catch (err) {
+                console.warn("Không thể tải dữ liệu admin từ API:", err);
+            }
+        }
+
+        // 4. XỬ LÝ MODAL (POPUP) THÊM SÁCH
+        const btnAddBook = document.querySelector('.btn-add');
+        const modalOverlay = document.getElementById('addBookModal');
+        const btnClose = document.querySelector('.close-modal');
+        const btnCancel = document.querySelector('.btn-cancel');
+
+        if(btnAddBook) btnAddBook.addEventListener('click', () => { modalOverlay.style.display = 'flex'; });
+        const closeModal = () => { if(modalOverlay) modalOverlay.style.display = 'none'; };
+        if(btnClose) btnClose.addEventListener('click', closeModal);
+        if(btnCancel) btnCancel.addEventListener('click', closeModal);
+        if(modalOverlay) modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+        // 5. NÚT HUẤN LUYỆN MÔ HÌNH
+        const btnRetrain = document.getElementById('btnRetrain');
+        if(btnRetrain) {
+            btnRetrain.addEventListener('click', function() {
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ĐANG HUẤN LUYỆN...';
+                this.style.backgroundColor = '#A1A1A1';
+                this.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fa-solid fa-check"></i> HOÀN TẤT CẬP NHẬT';
+                    this.style.backgroundColor = '#4CAF50';
+                    alert("Mô hình đã được huấn luyện lại thành công với dữ liệu mới!");
+                    
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fa-solid fa-gears"></i> BẮT ĐẦU HUẤN LUYỆN LẠI';
+                        this.style.backgroundColor = '#DF6B8A';
+                        this.style.pointerEvents = 'auto';
+                    }, 3000);
+                }, 2500); 
+            });
+        }
+
+        // Tự động tải dữ liệu khi mở trang quản trị
+        loadAdminData();
+    </script>
+
+</body>
+</html>

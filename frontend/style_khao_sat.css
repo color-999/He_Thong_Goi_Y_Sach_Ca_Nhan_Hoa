@@ -1,0 +1,173 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Nền bầu trời có mây và sao phía sau */
+.survey-page {
+    /* Dùng ảnh thật làm nền */
+    background-image: url('anh_bia.png');
+    background-size: cover; /* Ép ảnh phủ kín toàn bộ màn hình */
+    background-position: center; /* Canh giữa ảnh */
+    background-attachment: fixed; /* Giữ ảnh đứng im khi cuộn trang */
+    background-repeat: no-repeat;
+    
+    background-color: #E6F0FA; /* Màu nền dự phòng nếu ảnh bị lỗi */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Phần Tiêu đề */
+.header-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.main-title {
+    font-family: 'Agbalumo', cursive;
+    background-color: #F8BACF; /* Màu hồng nền */
+    color: #FFFFFF;
+    font-size: 32px;
+    padding: 15px 60px;
+    border-radius: 30px;
+    box-shadow: 0px 4px 10px rgba(223, 107, 138, 0.4);
+    text-shadow: 2px 2px 0px #DF6B8A; /* Viền bóng chữ */
+    letter-spacing: 2px;
+}
+
+/* Khung khảo sát chính */
+.survey-card {
+    background-color: #F0A0B8; /* Viền hồng đậm */
+    width: 100%;
+    max-width: 1000px;
+    border-radius: 40px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* NỀN GIẤY CARO TỪ ẢNH FIGMA */
+.paper-bg {
+    background-image: url('bia_trong.png');
+    background-size: cover; /* Để ảnh phủ kín khung viền cong */
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    background-color: #FEF0F2; /* Màu dự phòng */
+}
+
+/* Cột Trái & Phải */
+.survey-col {
+    flex: 1;
+    border-radius: 30px;
+    padding: 30px 40px;
+}
+
+/* Tiêu đề câu hỏi */
+.q-title {
+    font-size: 22px;
+    color: #333333;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.q-desc {
+    font-size: 14px;
+    color: #555555;
+    margin-bottom: 15px;
+}
+
+.question-block {
+    margin-bottom: 30px;
+}
+
+/* --- Tùy chỉnh danh sách lựa chọn --- */
+.option-list, .author-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* Lưới 2 cột cho Câu 2 */
+.genre-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 10px;
+    column-gap: 20px;
+}
+
+/* Ô input tìm kiếm tác giả */
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #E2E2E2;
+    border-radius: 20px;
+    padding: 8px 15px;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    color: #555;
+}
+
+.search-box input::placeholder {
+    color: #999;
+}
+
+/* Ô điền 3 cuốn sách */
+.custom-textarea {
+    width: 100%;
+    height: 120px;
+    background-color: #E2E2E2;
+    border: none;
+    border-radius: 15px;
+    padding: 15px;
+    font-size: 14px;
+    resize: none; /* Không cho kéo dãn */
+    outline: none;
+}
+
+.custom-textarea::placeholder {
+    color: #999;
+}
+
+/* Nút hoàn thành thêm vào dưới cùng */
+.btn-submit-survey {
+    margin-top: 30px;
+    background-color: #F8BACF; 
+    color: #DF6B8A; 
+    border: none;
+    padding: 12px 60px;
+    font-size: 22px;
+    font-family: 'Agbalumo', cursive; 
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+}
+
+.btn-submit-survey:hover {
+    background-color: #F0A0B8;
+    color: #FFFFFF;
+}

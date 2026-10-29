@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khảo Sát Sở Thích Đọc Sách</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Link file CSS -->
+    <link rel="stylesheet" href="style_khao_sat.css">
+</head>
+<body>
+    <div class="survey-page">
+        <!-- Phần tiêu đề và Header -->
+        <div class="header-container">
+            <h1 class="main-title">KHẢO SÁT SỞ THÍCH ĐỌC SÁCH</h1>
+        </div>
+
+        <!-- Khung khảo sát chính -->
+        <div class="survey-card">
+            
+            <!-- CỘT TRÁI -->
+            <div class="survey-col paper-bg">
+                
+                <!-- Câu 1 -->
+                <div class="question-block">
+                    <h2 class="q-title">1. Độ tuổi của bạn?</h2>
+                    <p class="q-desc">Để mình tìm sách phù hợp với độ tuổi của bạn nhé (∗ ´ ▽ ` ∗)</p>
+                    
+                    <div class="option-list">
+                        <div class="option-item radio-age" data-checked="false">
+                            <img src="icon/Chưa chọn.svg" width="20" height="20">
+                            <span>Dưới 18 tuổi</span>
+                        </div>
+                        <div class="option-item radio-age" data-checked="false">
+                            <img src="icon/Chưa chọn.svg" width="20" height="20">
+                            <span>Trên 18 tuổi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div class="question-block">
+                    <h2 class="q-title">2. Thể loại sách yêu thích của bạn là gì?</h2>
+                    <p class="q-desc">Chọn ít nhất 3 thể loại nhé (∗ ´ ▽ ` ∗)</p>
+                    
+                    <div class="genre-grid">
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Lãng mạn</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Kỹ năng</span></div>
+                        
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Giả tưởng / Phép thuật</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Kinh doanh</span></div>
+                        
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Khoa học viễn tưởng</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Tâm lý</span></div>
+                        
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Trinh thám</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Hồi ký</span></div>
+                        
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Kịch tính</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Khoa học</span></div>
+                        
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Kinh dị</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Lịch sử</span></div>
+                        
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Phiêu lưu / Hành động</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Triết học</span></div>
+
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Tiểu thuyết lịch sử</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Sức khỏe</span></div>
+
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Tuổi teen</span></div>
+                        <div></div> 
+
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Truyện tranh</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI -->
+            <div class="survey-col paper-bg">
+                
+                <!-- Câu 3 -->
+                <div class="question-block">
+                    <h2 class="q-title">3. Bạn yêu thích tác giả nào vậy?</h2>
+                    <p class="q-desc">Câu này không bắt buộc đâu nè (∗ ´ ▽ ` ∗)</p>
+                    
+                    <div class="search-box">
+                        <img src="icon/search.svg" alt="Search" width="18">
+                        <!-- Đã thêm id="author-search-input" để JS bắt sự kiện -->
+                        <input type="text" id="author-search-input" placeholder="Nhập tên tác giả yêu thích (Ấn Enter để thêm)">
+                    </div>
+
+                    <div class="author-list">
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Nguyễn Nhật Ánh (Kính vạn hoa)</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>J.K. Rowling (Harry Potter)</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Higashino Keigo (Phía sau nghi can X)</span></div>
+                        <div class="option-item custom-checkbox" data-checked="false"><img src="icon/chx_chon_nhieu.svg" width="18"> <span>Agatha Christie (Và rồi chẳng còn ai)</span></div>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div class="question-block">
+                    <h2 class="q-title">4. Kể tên 3 cuốn sách bạn đã đọc và cảm thấy yêu thích</h2>
+                    <p class="q-desc">Bật mí gu đọc sách của bạn để mình tìm thêm những cuốn hợp gu nhé! (∗ ´ ▽ ` ∗)</p>
+                    
+                    <textarea class="custom-textarea" placeholder="Điền thông tin vào đây nhé! (Phân cách bằng dấu phẩy)"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nút Gửi Khảo Sát -->
+        <button class="btn-submit-survey">HOÀN THÀNH</button>
+
+    </div>
+
+    <!-- ===== JAVASCRIPT XỬ LÝ LỰA CHỌN & GỌI API ===== -->
+    <script>
+        // Xử lý chọn tuổi
+        const ageRadios = document.querySelectorAll('.radio-age');
+        ageRadios.forEach(radio => radio.addEventListener('click', function() {
+            ageRadios.forEach(r => { r.setAttribute('data-checked', 'false'); r.querySelector('img').src = 'icon/Chưa chọn.svg'; });
+            this.setAttribute('data-checked', 'true'); this.querySelector('img').src = 'icon/da_chon.svg';
+        }));
+
+        // Hàm toggle trạng thái checkbox (dùng chung)
+        function toggleCheckbox(element) {
+            const checked = element.getAttribute('data-checked') === 'true';
+            element.setAttribute('data-checked', String(!checked));
+            element.querySelector('img').src = !checked ? 'icon/chon_nhieu.svg' : 'icon/chx_chon_nhieu.svg';
+        }
+
+        // Gắn sự kiện click cho các checkbox có sẵn lúc mới tải trang
+        document.querySelectorAll('.custom-checkbox').forEach(cb => {
+            cb.addEventListener('click', function() { toggleCheckbox(this); });
+        });
+
+        // --- BỔ SUNG: Xử lý nhập tác giả mới ---
+        const authorInput = document.getElementById('author-search-input');
+        const authorList = document.querySelector('.author-list');
+
+        authorInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const authorName = this.value.trim();
+                if (!authorName) return;
+
+                // Kiểm tra xem tác giả này đã có trong danh sách chưa
+                const existingItems = Array.from(authorList.querySelectorAll('.custom-checkbox span'))
+                                          .map(s => s.innerText.trim().split(' (')[0].toLowerCase());
+                
+                if (!existingItems.includes(authorName.toLowerCase())) {
+                    // Tạo thẻ checkbox mới
+                    const newItem = document.createElement('div');
+                    newItem.className = 'option-item custom-checkbox';
+                    newItem.setAttribute('data-checked', 'true');
+                    newItem.innerHTML = `<img src="icon/chon_nhieu.svg" width="18"> <span>${authorName}</span>`;
+                    
+                    // Gắn sự kiện click cho thẻ mới
+                    newItem.addEventListener('click', function() { toggleCheckbox(this); });
+                    
+                    // Thêm vào giao diện
+                    authorList.appendChild(newItem);
+                } else {
+                    // Nếu đã có sẵn, tự động tick chọn nó
+                    const items = authorList.querySelectorAll('.custom-checkbox');
+                    for (let item of items) {
+                        if (item.querySelector('span').innerText.trim().split(' (')[0].toLowerCase() === authorName.toLowerCase()) {
+                            item.setAttribute('data-checked', 'true');
+                            item.querySelector('img').src = 'icon/chon_nhieu.svg';
+                            break;
+                        }
+                    }
+                }
+                this.value = ''; // Xóa trống ô nhập liệu sau khi thêm thành công
+            }
+        });
+        // ----------------------------------------
+
+        const btnSubmit = document.querySelector('.btn-submit-survey');
+        btnSubmit.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const userId = localStorage.getItem('user_id');
+            if (!userId || userId === 'guest') { alert('Vui lòng đăng nhập trước khi lưu khảo sát.'); window.location.href='login.html'; return; }
+            
+            const selectedGenres = Array.from(document.querySelectorAll('.genre-grid .custom-checkbox'))
+                .filter(cb => cb.getAttribute('data-checked') === 'true').map(cb => cb.querySelector('span').innerText.trim());
+            
+            // Đoạn này sẽ tự động quét cả các checkbox mới được tạo từ ô input
+            const selectedAuthors = Array.from(document.querySelectorAll('.author-list .custom-checkbox'))
+                .filter(cb => cb.getAttribute('data-checked') === 'true').map(cb => cb.querySelector('span').innerText.trim().split(' (')[0]);
+            
+            const text = document.querySelector('.custom-textarea').value.trim();
+            const selectedBooks = text ? text.split(',').map(x => x.trim()).filter(Boolean).slice(0,3) : [];
+            
+            if (selectedGenres.length < 3) { alert('Vui lòng chọn ít nhất 3 thể loại.'); return; }
+            
+            const profile = { user_id:userId, genres:selectedGenres, authors:selectedAuthors, books:selectedBooks, profile_source:'survey' };
+            btnSubmit.disabled = true; btnSubmit.innerText = 'ĐANG LƯU...';
+            try {
+                const response = await fetch('http://localhost:8000/api/user/profile', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(profile)});
+                const data = await response.json();
+                if (!response.ok || data.error || data.detail) throw new Error(data.detail || data.error || 'Không lưu được hồ sơ');
+                localStorage.setItem('ai_user_profile', JSON.stringify({genres:selectedGenres,authors:selectedAuthors,books:selectedBooks,profile_source:'survey'}));
+                localStorage.setItem('user_genres', JSON.stringify(selectedGenres));
+                localStorage.setItem('user_authors', JSON.stringify(selectedAuthors));
+                localStorage.setItem('user_top_books', JSON.stringify(selectedBooks));
+                localStorage.setItem('preference_profile_source','survey');
+                alert('Đã lưu khảo sát ban đầu. Trang Dành cho bạn sẽ dùng hồ sơ này cho đến khi bạn cập nhật sở thích.');
+                window.location.href='trang_chu.html';
+            } catch (err) { alert('Không thể lưu khảo sát lên máy chủ: '+err.message+'\nHãy kiểm tra API đang chạy rồi thử lại.'); }
+            finally { btnSubmit.disabled=false; btnSubmit.innerText='HOÀN THÀNH'; }
+        });
+    </script>
+</body>
+</html>
