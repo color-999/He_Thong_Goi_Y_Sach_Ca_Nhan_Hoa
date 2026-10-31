@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lịch Sử Đọc - Gợi Ý Sách</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="style_trang_chu.css">
-
     <style>
         .time-group-title { font-family: 'Agbalumo', cursive; color: var(--primary-color); font-size: 22px; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px dashed var(--hover-bg); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .read-time-badge { background: #F0F0F0; color: #666; font-size: 11px; padding: 4px 10px; border-radius: 12px; margin-top: 8px; display: inline-block; font-weight: 600; }
@@ -24,8 +21,6 @@
     </style>
 </head>
 <body>
-
-    <!-- SIDEBAR BÊN TRÁI -->
     <nav class="sidebar" id="sidebar">
         <div class="menu-toggle" id="menu-btn"><i class="fa-solid fa-bars"></i></div>
         <ul class="nav-list">
@@ -41,20 +36,16 @@
                 <li class="nav-item"><a href="login.html"><img src="icon/sign-out.svg" class="nav-icon" alt="Đăng xuất"><span class="nav-text">Đăng xuất.</span></a></li>
             </ul>
         </div>
-        <div class="mascot-container">
-            <img src="linh_vat_1.png" alt="Linh vật" class="mascot-img">
-        </div>
+        <div class="mascot-container"><img src="linh_vat_1.png" alt="Linh vật" class="mascot-img"></div>
     </nav>
 
-    <!-- NỘI DUNG CHÍNH -->
     <main class="main-content">
         <header class="top-header">
             <h1 style="font-family: 'Agbalumo', cursive; color: var(--primary-color);">Lịch Sử Đọc Của Bạn</h1>
             <p style="color: #666; margin-top: 5px;">Những cuốn sách bạn đã dành hơn 5 phút để nghiền ngẫm sẽ được lưu tại đây.</p>
         </header>
-
         <div class="content-wrapper" id="history-container">
-            <p style="text-align: center; color: #888; padding: 40px;"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu lịch sử...</p>
+            <p style="text-align: center; color: #888; padding: 40px;"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...</p>
         </div>
     </main>
 
@@ -63,9 +54,11 @@
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.querySelector('.main-content');
         menuBtn.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); mainContent.classList.toggle('expanded'); });
+
         function generateStars(rating) {
-            let starsHTML = '';
             const safeRating = Math.max(0, Math.min(5, Number(rating) || 0));
+            if (!safeRating) return '<span style="color:#999;font-size:11px;font-style:italic">Chưa có đánh giá</span>';
+            let starsHTML = '';
             const fullStars = Math.floor(safeRating);
             const hasHalfStar = safeRating - fullStars >= 0.5 ? 1 : 0;
             const emptyStars = 5 - fullStars - hasHalfStar;
@@ -74,12 +67,11 @@
             for (let i = 0; i < emptyStars; i++) starsHTML += '<i class="fa-regular fa-star"></i>';
             return starsHTML;
         }
-        function createHistoryBookCard(bookId, imgSrc, title, author, readDate, readDuration, rating=4.5) {
+
+        function createHistoryBookCard(bookId, imgSrc, title, author, readDuration, rating) {
             return `
                 <div class="book-card" id="history-book-${bookId}">
-                    <button class="btn-remove-history" title="Xóa khỏi lịch sử" onclick="removeHistory('${bookId}')">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                    <button class="btn-remove-history" title="Xóa" onclick="removeHistory('${bookId}')"><i class="fa-solid fa-xmark"></i></button>
                     <a href="chi_tiet_sach.html?id=${bookId}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; width: 100%;">
                         <img src="${imgSrc || 'bia_sach/bia_sach_chx_co.png'}" alt="${title}" class="book-cover-img" onerror="this.onerror=null;this.src='bia_sach/bia_sach_chx_co.png'">
                         <div class="book-stars" style="color:#FFD700; margin-top: 5px;">${generateStars(rating)}</div>
@@ -91,18 +83,21 @@
             `;
         }
 
-        function removeHistory(bookId) {
-            const confirmDelete = confirm("Bạn có chắc muốn xóa cuốn sách này khỏi lịch sử đọc?");
-            if(confirmDelete) {
+        async function syncHistoryToApi(history) {
+            const userId = localStorage.getItem('user_id');
+            if (!userId) return;
+            try { await fetch('http://localhost:8000/api/user/history', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:userId, history}) }); } catch {}
+        }
+
+        async function removeHistory(bookId) {
+            if(confirm("Bạn có chắc muốn xóa cuốn sách này khỏi lịch sử đọc?")) {
                 const card = document.getElementById(`history-book-${bookId}`);
                 if(card) card.remove();
-
-                // XÓA KHỎI BỘ NHỚ TRÌNH DUYỆT
                 let history = JSON.parse(localStorage.getItem('my_history')) || [];
                 history = history.filter(book => book.id !== bookId);
                 localStorage.setItem('my_history', JSON.stringify(history));
-
-                if (history.length === 0) { setTimeout(loadReadingHistory, 400); }
+                await syncHistoryToApi(history);
+                if (history.length === 0) setTimeout(loadReadingHistory, 400);
             }
         }
 
@@ -111,58 +106,58 @@
             const today = new Date();
             const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
             const startOfRead = new Date(readDate.getFullYear(), readDate.getMonth(), readDate.getDate());
-            const diffTime = startOfToday - startOfRead;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
-
+            const diffDays = Math.floor((startOfToday - startOfRead) / (1000 * 60 * 60 * 24)); 
             if (diffDays > 365) return "Quá hạn"; 
             if (diffDays === 0) return { group: "Hôm nay", icon: "fa-calendar-day" };
             if (diffDays === 1) return { group: "Hôm qua", icon: "fa-calendar-day" };
             if (diffDays <= 7) return { group: "Tuần này", icon: "fa-calendar-week" };
             if (diffDays <= 30) return { group: "Tháng này", icon: "fa-calendar-days" };
-            
-            const months = Math.floor(diffDays / 30);
-            return { group: `${months} Tháng trước`, icon: "fa-clock-rotate-left" };
+            return { group: `${Math.floor(diffDays / 30)} Tháng trước`, icon: "fa-clock-rotate-left" };
         }
 
-        function loadReadingHistory() {
+        async function loadReadingHistory() {
             const container = document.getElementById('history-container');
-            
-            // KÉO LỊCH SỬ THẬT TỪ BỘ NHỚ
-            const rawHistoryData = JSON.parse(localStorage.getItem('my_history')) || [];
+            const userId = localStorage.getItem('user_id');
+            let rawHistoryData = [];
 
-            setTimeout(() => {
-                container.innerHTML = ''; 
+            if (userId) {
+                try {
+                    const res = await fetch(`http://localhost:8000/api/user/history/${encodeURIComponent(userId)}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        rawHistoryData = data.history || [];
+                        localStorage.setItem('my_history', JSON.stringify(rawHistoryData));
+                    }
+                } catch (e) { console.warn('Dùng cache do lỗi API'); }
+            }
 
-                if (rawHistoryData.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-history">
-                            <i class="fa-solid fa-book-open-reader"></i>
-                            <h2>Chưa có lịch sử đọc</h2>
-                            <p>Hãy chọn một cuốn sách và đọc ít nhất 5 phút để hệ thống lưu lại nhé!</p>
-                        </div>
-                    `;
-                    return;
-                }
+            if (rawHistoryData.length === 0) {
+                try { rawHistoryData = JSON.parse(localStorage.getItem('my_history')) || []; } catch (e) {}
+            }
 
-                const groupedData = {};
-                rawHistoryData.forEach(book => {
-                    const timeCategory = categorizeReadDate(book.last_read);
-                    if (timeCategory === "Quá hạn") return; 
-                    
-                    const groupName = timeCategory.group;
-                    if (!groupedData[groupName]) { groupedData[groupName] = { icon: timeCategory.icon, books: [] }; }
-                    groupedData[groupName].books.push(book);
+            container.innerHTML = ''; 
+            if (rawHistoryData.length === 0) {
+                container.innerHTML = `<div class="empty-history"><i class="fa-solid fa-book-open-reader"></i><h2>Chưa có lịch sử đọc</h2><p>Hãy chọn một cuốn sách và đọc ít nhất 5 phút để hệ thống lưu lại nhé!</p></div>`;
+                return;
+            }
+
+            const groupedData = {};
+            rawHistoryData.forEach(book => {
+                const timeCategory = categorizeReadDate(book.last_read);
+                if (timeCategory === "Quá hạn") return; 
+                const groupName = timeCategory.group;
+                if (!groupedData[groupName]) { groupedData[groupName] = { icon: timeCategory.icon, books: [] }; }
+                groupedData[groupName].books.push(book);
+            });
+
+            for (const [groupName, groupData] of Object.entries(groupedData)) {
+                let groupHTML = `<h2 class="time-group-title"><i class="fa-solid ${groupData.icon}"></i> ${groupName}</h2><div class="book-grid">`;
+                groupData.books.forEach(book => {
+                    groupHTML += createHistoryBookCard(book.id, book.img, book.title, book.author, book.duration, book.rating);
                 });
-
-                for (const [groupName, groupData] of Object.entries(groupedData)) {
-                    let groupHTML = `<h2 class="time-group-title"><i class="fa-solid ${groupData.icon}"></i> ${groupName}</h2><div class="book-grid">`;
-                    groupData.books.forEach(book => {
-                        groupHTML += createHistoryBookCard(book.id, book.img, book.title, book.author, groupName, book.duration);
-                    });
-                    groupHTML += `</div>`;
-                    container.innerHTML += groupHTML;
-                }
-            }, 300);
+                groupHTML += `</div>`;
+                container.innerHTML += groupHTML;
+            }
         }
 
         loadReadingHistory();

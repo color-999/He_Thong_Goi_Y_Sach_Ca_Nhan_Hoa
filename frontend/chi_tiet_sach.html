@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -14,348 +13,75 @@
 
     <style>
         /* CSS DÀNH RIÊNG CHO TRANG CHI TIẾT SÁCH */
-        .breadcrumb {
-            margin-bottom: 20px;
-        }
+        .breadcrumb { margin-bottom: 20px; }
+        .btn-back { background: none; border: none; font-size: 16px; font-weight: 600; color: #666; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-back:hover { color: var(--primary-color); }
 
-        .btn-back {
-            background: none;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-
-        .btn-back:hover {
-            color: var(--primary-color);
-        }
-
-        .book-detail-container {
-            display: flex;
-            gap: 40px;
-            background: #FFFFFF;
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            padding: 40px;
-            min-height: 70vh;
-        }
+        .book-detail-container { display: flex; gap: 40px; background: #FFFFFF; border: 1px solid var(--border-color); border-radius: 30px; padding: 40px; min-height: 70vh; }
 
         /* CỘT TRÁI */
-        .book-detail-left {
-            flex: 0 0 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .detail-cover {
-            width: 200px;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-            box-shadow: -5px 5px 15px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-
-        .detail-stars {
-            color: #FFD700;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .detail-rating-text {
-            font-size: 14px;
-            color: #666;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .detail-small-title {
-            font-family: 'Agbalumo', cursive;
-            color: var(--primary-color);
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .detail-author {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 20px;
-        }
+        .book-detail-left { flex: 0 0 250px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .detail-cover { width: 200px; height: 300px; object-fit: cover; border-radius: 10px; box-shadow: -5px 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; }
+        .detail-stars { color: #FFD700; font-size: 18px; margin-bottom: 5px; }
+        .detail-rating-text { font-size: 14px; color: #666; font-weight: 600; margin-bottom: 15px; }
+        .detail-small-title { font-family: 'Agbalumo', cursive; color: var(--primary-color); font-size: 18px; margin-bottom: 5px; }
+        .detail-author { font-size: 14px; color: #555; margin-bottom: 20px; }
 
         /* NHÓM NÚT ĐỌC VÀ YÊU THÍCH */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .btn-read {
-            flex: 1;
-            background-color: var(--primary-color);
-            color: #FFF;
-            border: none;
-            padding: 12px 0;
-            border-radius: 15px;
-            font-family: 'Agbalumo', cursive;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(139, 30, 40, 0.2);
-        }
-
-        .btn-read:hover {
-            background-color: #6e161f;
-            transform: translateY(-2px);
-        }
-
-        .btn-favorite {
-            background-color: #F0F0F0;
-            color: #888;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 15px;
-            font-size: 22px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.3s;
-        }
-
-        .btn-favorite.active {
-            color: #DF6B8A;
-            background-color: #FDF0F0;
-        }
-
-        .btn-favorite:hover {
-            transform: scale(1.1);
-        }
+        .action-buttons { display: flex; gap: 10px; width: 100%; }
+        .btn-read { flex: 1; background-color: var(--primary-color); color: #FFF; border: none; padding: 12px 0; border-radius: 15px; font-family: 'Agbalumo', cursive; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(139, 30, 40, 0.2); }
+        .btn-read:hover { background-color: #6e161f; transform: translateY(-2px); }
+        
+        .btn-favorite { background-color: #F0F0F0; color: #888; border: none; width: 45px; height: 45px; border-radius: 15px; font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        .btn-favorite.active { color: #DF6B8A; background-color: #FDF0F0; }
+        .btn-favorite:hover { transform: scale(1.1); }
 
         /* CỘT PHẢI */
-        .book-detail-right {
-            flex: 1;
-            padding-left: 20px;
-            border-left: 1px solid #eee;
-        }
+        .book-detail-right { flex: 1; padding-left: 20px; border-left: 1px solid #eee; }
+        .detail-big-title { font-family: 'Agbalumo', cursive; color: var(--primary-color); font-size: 42px; margin-bottom: 10px; line-height: 1.2; }
+        .detail-meta { display: flex; gap: 20px; margin-bottom: 30px; font-size: 13px; color: #888; flex-wrap: wrap; }
+        .detail-meta span { background: #F8F8F8; padding: 5px 12px; border-radius: 15px; border: 1px solid #eee; }
+        
+        .summary-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .book-summary { font-size: 15px; line-height: 1.8; color: #444; text-align: justify; white-space: pre-line; }
 
-        .detail-big-title {
-            font-family: 'Agbalumo', cursive;
-            color: var(--primary-color);
-            font-size: 42px;
-            margin-bottom: 10px;
-            line-height: 1.2;
-        }
+        /* === PHẦN ĐÁNH GIÁ SÁCH === */
+        .review-section { margin-top: 50px; padding-top: 30px; border-top: 2px dashed #F2C7D4; }
+        .review-section-title { font-size: 22px; font-weight: 600; color: #333; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+        .review-form { background: #FDF8F9; border-radius: 15px; padding: 25px; margin-bottom: 30px; border: 1px solid #F2C7D4; box-shadow: 0 4px 15px rgba(223, 107, 138, 0.05); }
+        .review-form-label { font-weight: 600; color: #555; margin-bottom: 10px; display: block; }
+        
+        .star-rating { display: flex; gap: 8px; margin-bottom: 20px; font-size: 32px; cursor: pointer; }
+        .star-rating i { transition: transform 0.15s, color 0.15s; }
+        .star-rating i:hover { transform: scale(1.15); }
+        .star-rating i.fa-solid { color: #FFD700; }
+        .star-rating i.fa-regular { color: #E2E8F0; }
 
-        .detail-meta {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            font-size: 13px;
-            color: #888;
-            flex-wrap: wrap;
-        }
+        .review-comment { width: 100%; padding: 15px; border: 1px solid #E2E8F0; border-radius: 12px; font-family: inherit; font-size: 15px; resize: vertical; min-height: 120px; box-sizing: border-box; outline: none; transition: 0.2s; background: #FFF; }
+        .review-comment:focus { border-color: #DF6B8A; box-shadow: 0 0 0 3px rgba(223, 107, 138, 0.1); }
+        
+        .review-submit-wrapper { display: flex; justify-content: flex-end; margin-top: 15px; }
+        .review-submit { background: #DF6B8A; color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 4px 12px rgba(223, 107, 138, 0.3); }
+        .review-submit:hover { background: #c95b77; transform: translateY(-3px) scale(1.05); }
+        .review-submit:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
 
-        .detail-meta span {
-            background: #F8F8F8;
-            padding: 5px 12px;
-            border-radius: 15px;
-            border: 1px solid #eee;
-        }
+        .review-list { display: flex; flex-direction: column; gap: 15px; }
+        .review-item { background: white; border: 1px solid #eee; border-radius: 15px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .review-user { font-weight: 600; color: #333; display: flex; align-items: center; gap: 5px; }
+        .review-date { font-size: 13px; color: #999; }
+        .review-stars { color: #FFD700; margin-bottom: 10px; font-size: 14px; }
+        .review-text { color: #444; line-height: 1.6; margin: 0; font-size: 15px; }
+        .review-empty { text-align: center; color: #999; padding: 30px; font-style: italic; background: #FAFAFA; border-radius: 12px; }
+        .review-login-hint { text-align: center; color: #666; padding: 20px; background: #FAFAFA; border-radius: 12px; border: 1px solid #eee; }
+        .review-login-hint a { color: var(--primary-color); text-decoration: underline; font-weight: 600; }
 
-        .summary-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .book-summary {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #444;
-            text-align: justify;
-            white-space: pre-line;
-        }
-
-        /* Giữ giao diện dễ sử dụng trên màn hình nhỏ */
         @media (max-width: 768px) {
-            .book-detail-container {
-                flex-direction: column;
-                padding: 24px;
-                gap: 25px;
-            }
-
-            .book-detail-left {
-                flex: 1;
-                width: 100%;
-            }
-
-            .book-detail-right {
-                padding-left: 0;
-                border-left: none;
-                border-top: 1px solid #eee;
-                padding-top: 25px;
-            }
-
-            .detail-big-title {
-                font-size: 30px;
-            }
-
-            .detail-meta {
-                gap: 10px;
-            }
-                    /* === PHẦN ĐÁNH GIÁ SÁCH === */
-            .review-section {
-                margin-top: 40px;
-                padding-top: 30px;
-                border-top: 1px solid #eee;
-            }
-
-            .review-section-title {
-                font-size: 22px;
-                font-weight: 600;
-                color: #333;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .review-form {
-                background: #FAFAFA;
-                border-radius: 15px;
-                padding: 20px;
-                margin-bottom: 25px;
-            }
-
-            .review-form-label {
-                font-weight: 600;
-                color: #555;
-                margin-bottom: 10px;
-                display: block;
-            }
-
-            .star-rating {
-                display: flex;
-                gap: 5px;
-                margin-bottom: 15px;
-                font-size: 28px;
-                color: #FFD700;
-                cursor: pointer;
-            }
-
-            .star-rating i {
-                transition: transform 0.15s;
-            }
-
-            .star-rating i:hover {
-                transform: scale(1.15);
-            }
-
-            .star-rating i.fa-regular {
-                color: #DDD;
-            }
-
-            .review-comment {
-                width: 100%;
-                padding: 12px;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                font-family: inherit;
-                font-size: 14px;
-                resize: vertical;
-                min-height: 80px;
-                box-sizing: border-box;
-            }
-
-            .review-submit {
-                margin-top: 10px;
-                background: var(--primary-color, #8B1E28);
-                color: white;
-                border: none;
-                padding: 10px 24px;
-                border-radius: 10px;
-                font-family: 'Agbalumo', cursive;
-                font-size: 15px;
-                cursor: pointer;
-                transition: 0.2s;
-            }
-
-            .review-submit:hover {
-                background: #6e161f;
-            }
-
-            .review-submit:disabled {
-                background: #ccc;
-                cursor: not-allowed;
-            }
-
-            .review-list {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .review-item {
-                background: white;
-                border: 1px solid #eee;
-                border-radius: 12px;
-                padding: 15px;
-            }
-
-            .review-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-            }
-
-            .review-user {
-                font-weight: 600;
-                color: #333;
-            }
-
-            .review-date {
-                font-size: 12px;
-                color: #999;
-            }
-
-            .review-stars {
-                color: #FFD700;
-                margin-bottom: 8px;
-            }
-
-            .review-text {
-                color: #555;
-                line-height: 1.6;
-                margin: 0;
-            }
-
-            .review-empty {
-                text-align: center;
-                color: #999;
-                padding: 20px;
-                font-style: italic;
-            }
-
-            .review-login-hint {
-                text-align: center;
-                color: #999;
-                padding: 15px;
-                background: #FAFAFA;
-                border-radius: 10px;
-            }
+            .book-detail-container { flex-direction: column; padding: 24px; gap: 25px; }
+            .book-detail-left { flex: 1; width: 100%; }
+            .book-detail-right { padding-left: 0; border-left: none; border-top: 1px solid #eee; padding-top: 25px; }
+            .detail-big-title { font-size: 30px; }
+            .detail-meta { gap: 10px; }
         }
     </style>
 </head>
@@ -364,65 +90,20 @@
 
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
-        <div class="menu-toggle" id="menu-btn">
-            <i class="fa-solid fa-bars"></i>
-        </div>
-
+        <div class="menu-toggle" id="menu-btn"><i class="fa-solid fa-bars"></i></div>
         <ul class="nav-list">
-            <li class="nav-item">
-                <a href="trang_chu.html">
-                    <img src="icon/trang_chu.svg" class="nav-icon" alt="Trang chủ">
-                    <span class="nav-text">Trang chủ</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="danh_cho_bn.html">
-                    <img src="icon/danh_cho_bn.svg" class="nav-icon" alt="Dành cho bạn">
-                    <span class="nav-text">Dành cho bạn</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="lich_su_doc.html">
-                    <img src="icon/lich_su_doc.svg" class="nav-icon" alt="Lịch sử đọc">
-                    <span class="nav-text">Lịch sử đọc</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="yeu_thich.html">
-                    <img src="icon/book-heart.svg" class="nav-icon" alt="Yêu thích">
-                    <span class="nav-text">Yêu thích</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="cap_nhat_so_thich.html">
-                    <img src="icon/book-cap_nhat.svg" class="nav-icon" alt="Cập nhật sở thích">
-                    <span class="nav-text">Cập nhật sở thích</span>
-                </a>
-            </li>
+            <li class="nav-item"><a href="trang_chu.html"><img src="icon/trang_chu.svg" class="nav-icon" alt="Trang chủ"><span class="nav-text">Trang chủ</span></a></li>
+            <li class="nav-item"><a href="danh_cho_bn.html"><img src="icon/danh_cho_bn.svg" class="nav-icon" alt="Dành cho bạn"><span class="nav-text">Dành cho bạn</span></a></li>
+            <li class="nav-item"><a href="lich_su_doc.html"><img src="icon/lich_su_doc.svg" class="nav-icon" alt="Lịch sử đọc"><span class="nav-text">Lịch sử đọc</span></a></li>
+            <li class="nav-item"><a href="yeu_thich.html"><img src="icon/book-heart.svg" class="nav-icon" alt="Yêu thích"><span class="nav-text">Yêu thích</span></a></li>
+            <li class="nav-item"><a href="cap_nhat_so_thich.html"><img src="icon/book-cap_nhat.svg" class="nav-icon" alt="Cập nhật sở thích"><span class="nav-text">Cập nhật sở thích</span></a></li>
         </ul>
-
         <div class="bottom-menu">
             <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="ho_so_ca_nhan.html">
-                        <img src="icon/card-outline.svg" class="nav-icon" alt="Hồ sơ cá nhân">
-                        <span class="nav-text">Hồ sơ cá nhân</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="login.html">
-                        <img src="icon/sign-out.svg" class="nav-icon" alt="Đăng xuất">
-                        <span class="nav-text">Đăng xuất.</span>
-                    </a>
-                </li>
+                <li class="nav-item"><a href="ho_so_ca_nhan.html"><img src="icon/card-outline.svg" class="nav-icon" alt="Hồ sơ cá nhân"><span class="nav-text">Hồ sơ cá nhân</span></a></li>
+                <li class="nav-item"><a href="login.html"><img src="icon/sign-out.svg" class="nav-icon" alt="Đăng xuất"><span class="nav-text">Đăng xuất.</span></a></li>
             </ul>
         </div>
-
         <div class="mascot-container">
             <img src="linh_vat_1.png" alt="Linh vật" class="mascot-img">
         </div>
@@ -430,97 +111,40 @@
 
     <!-- NỘI DUNG CHÍNH -->
     <main class="main-content">
-
         <div class="breadcrumb">
-            <button class="btn-back" onclick="history.back()">
-                <i class="fa-solid fa-arrow-left"></i> Quay lại
-            </button>
+            <button class="btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
         </div>
 
         <div class="book-detail-container">
-
-            <!-- CỘT TRÁI: ẢNH BÌA VÀ TƯƠNG TÁC -->
+            <!-- CỘT TRÁI -->
             <div class="book-detail-left">
-
-                <!-- Ảnh bìa sẽ được cập nhật tự động từ API -->
-                <img
-                    src="bia_sach/bia_sach_chx_co.png"
-                    alt="Bìa sách"
-                    class="detail-cover"
-                    id="bookCover"
-                >
-
-                <div class="detail-stars" id="detailStars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star-half-stroke"></i>
-                </div>
-
-                <div class="detail-rating-text" id="detailRatingText">
-                    Đang tải đánh giá...
-                </div>
-
-                <h3 class="detail-small-title" id="smallTitle">
-                    Đang tải tên sách...
-                </h3>
-
-                <p class="detail-author" id="bookAuthor">
-                    Đang tải tác giả...
-                </p>
+                <img src="bia_sach/bia_sach_chx_co.png" alt="Bìa sách" class="detail-cover" id="bookCover">
+                <div class="detail-stars" id="detailStars"><i class="fa-solid fa-star"></i></div>
+                <div class="detail-rating-text" id="detailRatingText">Đang tải đánh giá...</div>
+                <h3 class="detail-small-title" id="smallTitle">Đang tải tên sách...</h3>
+                <p class="detail-author" id="bookAuthor">Đang tải tác giả...</p>
 
                 <div class="action-buttons">
-                    <button class="btn-read" id="btnRead">
-                        <i class="fa-solid fa-book-open"></i> Đọc thử
-                    </button>
-
-                    <button
-                        class="btn-favorite"
-                        id="btnFavorite"
-                        title="Thêm vào yêu thích"
-                    >
-                        <i class="fa-regular fa-heart" id="heartIcon"></i>
-                    </button>
+                    <button class="btn-read" id="btnRead"><i class="fa-solid fa-book-open"></i> Đọc thử</button>
+                    <button class="btn-favorite" id="btnFavorite" title="Thêm vào yêu thích"><i class="fa-regular fa-heart" id="heartIcon"></i></button>
                 </div>
             </div>
 
-            <!-- CỘT PHẢI: THÔNG TIN CHI TIẾT -->
+            <!-- CỘT PHẢI -->
             <div class="book-detail-right">
-
-                <h1 class="detail-big-title" id="bigTitle">
-                    Đang tải thông tin sách...
-                </h1>
-
+                <h1 class="detail-big-title" id="bigTitle">Đang tải thông tin sách...</h1>
+                
                 <div class="detail-meta">
-                    <span id="publisherInfo">
-                        <i class="fa-solid fa-building"></i>
-                        NXB: Đang cập nhật
-                    </span>
-
-                    <span id="yearInfo">
-                        <i class="fa-regular fa-calendar"></i>
-                        Năm XB: Đang cập nhật
-                    </span>
-
-                    <span id="pagesInfo">
-                        <i class="fa-solid fa-layer-group"></i>
-                        Số trang: Đang cập nhật
-                    </span>
+                    <span id="publisherInfo"><i class="fa-solid fa-building"></i> NXB: Đang cập nhật</span>
+                    <span id="yearInfo"><i class="fa-regular fa-calendar"></i> Năm XB: Đang cập nhật</span>
+                    <span id="pagesInfo"><i class="fa-solid fa-layer-group"></i> Số trang: Đang cập nhật</span>
                 </div>
 
-                <!-- Chỉ giữ MỘT mục tóm tắt sách -->
                 <div class="summary-title">
-                    <i
-                        class="fa-solid fa-book-open"
-                        style="color: var(--primary-color);"
-                    ></i>
-                    Tóm tắt sách
+                    <i class="fa-solid fa-book-open" style="color: var(--primary-color);"></i> Tóm tắt sách
                 </div>
 
-                                <div class="book-summary" id="bookSummary">
-                    Đang tải tóm tắt sách...
-                </div>
+                <div class="book-summary" id="bookSummary">Đang tải tóm tắt sách...</div>
 
                 <!-- === PHẦN ĐÁNH GIÁ SÁCH === -->
                 <div class="review-section">
@@ -541,14 +165,14 @@
                                 <i class="fa-regular fa-star" data-value="5"></i>
                             </div>
                             <textarea class="review-comment" id="reviewComment" placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..."></textarea>
-                            <button class="review-submit" id="btnSubmitReview">
-                                <i class="fa-solid fa-paper-plane"></i> Gửi đánh giá
-                            </button>
+                            <div class="review-submit-wrapper">
+                                <button class="review-submit" id="btnSubmitReview" title="Gửi đánh giá">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="review-login-hint" id="reviewLoginHint">
-                            <i class="fa-solid fa-lock"></i> Vui lòng
-                            <a href="login.html" style="color: var(--primary-color, #8B1E28); text-decoration: underline;">đăng nhập</a>
-                            để đánh giá sách.
+                            <i class="fa-solid fa-lock"></i> Vui lòng <a href="login.html">đăng nhập</a> để đánh giá sách.
                         </div>
                     </div>
 
@@ -556,112 +180,58 @@
                         <div class="review-empty">Đang tải đánh giá...</div>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
 
     <script>
-        // =========================
-        // 1. MENU ĐIỀU HƯỚNG
-        // =========================
         const menuBtn = document.getElementById('menu-btn');
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.querySelector('.main-content');
+        menuBtn.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); mainContent.classList.toggle('expanded'); });
 
-        menuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        });
-
-        // =========================
-        // 2. LẤY MÃ SÁCH TỪ URL
-        // =========================
         const urlParams = new URLSearchParams(window.location.search);
         const currentBookId = urlParams.get('id');
-
-        // Đường dẫn ảnh mặc định nếu sách không có ảnh hợp lệ.
-        // Đường dẫn này giả định thư mục bia_sach nằm cạnh file HTML.
+        let currentBookRating = 0;
         const DEFAULT_COVER = 'bia_sach/bia_sach_chx_co.png';
+        const API_BASE = 'http://localhost:8000';
 
-        // =========================
-        // 3. HIỂN THỊ ĐÁNH GIÁ
-        // =========================
         function generateStars(rating) {
-            let starsHTML = '';
-
             const safeRating = Math.max(0, Math.min(5, Number(rating) || 0));
+            if (!safeRating) return '<span style="color:#999;font-size:11px;font-style:italic">Chưa có đánh giá</span>';
+            
+            let starsHTML = '';
             const fullStars = Math.floor(safeRating);
             const hasHalfStar = safeRating - fullStars >= 0.5 ? 1 : 0;
             const emptyStars = 5 - fullStars - hasHalfStar;
 
-            for (let i = 0; i < fullStars; i++) {
-                starsHTML += '<i class="fa-solid fa-star"></i>';
-            }
-
-            if (hasHalfStar) {
-                starsHTML += '<i class="fa-solid fa-star-half-stroke"></i>';
-            }
-
-            for (let i = 0; i < emptyStars; i++) {
-                starsHTML += '<i class="fa-regular fa-star"></i>';
-            }
-
+            for (let i = 0; i < fullStars; i++) starsHTML += '<i class="fa-solid fa-star"></i>';
+            if (hasHalfStar) starsHTML += '<i class="fa-solid fa-star-half-stroke"></i>';
+            for (let i = 0; i < emptyStars; i++) starsHTML += '<i class="fa-regular fa-star"></i>';
             return starsHTML;
         }
 
-        // =========================
-        // 4. TỰ ĐỘNG TÌM ẢNH BÌA
-        // =========================
         function setBookCover(coverPath) {
             const cover = document.getElementById('bookCover');
-
-            // Hủy xử lý lỗi của lần tải ảnh trước.
             cover.onerror = null;
-
-            // Nếu API không cung cấp ảnh, dùng ảnh mặc định.
             if (!coverPath || typeof coverPath !== 'string' || !coverPath.trim()) {
                 cover.src = DEFAULT_COVER;
                 return;
             }
-
             const path = coverPath.trim();
-
-            // Nếu API trả về URL đầy đủ thì sử dụng trực tiếp.
             if (/^https?:\/\//i.test(path) || path.startsWith('data:')) {
-                cover.onerror = function () {
-                    cover.onerror = null;
-                    cover.src = DEFAULT_COVER;
-                };
-
+                cover.onerror = function () { cover.onerror = null; cover.src = DEFAULT_COVER; };
                 cover.src = path;
                 return;
             }
-
-            // Thử đường dẫn tương đối trước, phù hợp khi thư mục
-            // bia_sach được phục vụ cùng với trang HTML.
             const relativePath = path.replace(/\\/g, '/').replace(/^\.\/+/, '');
-
-            const candidates = [
-                new URL(relativePath, window.location.href).href
-            ];
-
-            // Nếu đường dẫn chưa bắt đầu bằng /, thử thêm đường dẫn
-            // từ máy chủ FastAPI, ví dụ localhost:8000/bia_sach/...
+            const candidates = [ new URL(relativePath, window.location.href).href ];
             if (!relativePath.startsWith('/')) {
-                candidates.push(
-                    'http://localhost:8000/' +
-                    relativePath.replace(/^\/+/, '')
-                );
+                candidates.push('http://localhost:8000/' + relativePath.replace(/^\/+/, ''));
             }
-
-            // Nếu cả hai cách trên đều không tải được,
-            // mới sử dụng ảnh mặc định.
             let index = 0;
-
             cover.onerror = function () {
                 index++;
-
                 if (index < candidates.length) {
                     cover.src = candidates[index];
                 } else {
@@ -669,33 +239,23 @@
                     cover.src = DEFAULT_COVER;
                 }
             };
-
             cover.src = candidates[index];
         }
 
-        // Nếu ảnh mặc định cũng không tồn tại thì ẩn ảnh bị lỗi.
-        // Khi đó không để trình duyệt hiện biểu tượng ảnh hỏng.
         document.getElementById('bookCover').addEventListener('error', function () {
-            if (this.src.endsWith('bia_sach_chx_co.png')) {
-                this.style.visibility = 'hidden';
-            }
+            if (this.src.endsWith('bia_sach_chx_co.png')) this.style.visibility = 'hidden';
         });
 
-        // =========================
-        // 5. TẢI CHI TIẾT SÁCH TỪ FASTAPI
-        // =========================
         async function loadBookDetailFromURL() {
             const cover = document.getElementById('bookCover');
             const bigTitle = document.getElementById('bigTitle');
             const smallTitle = document.getElementById('smallTitle');
             const authorEl = document.getElementById('bookAuthor');
             const summary = document.getElementById('bookSummary');
-
             const publisherEl = document.getElementById('publisherInfo');
             const yearEl = document.getElementById('yearInfo');
             const pagesEl = document.getElementById('pagesInfo');
 
-            // Đặt ảnh mặc định trong lúc chờ API.
             cover.style.visibility = 'visible';
             setBookCover('');
 
@@ -703,226 +263,174 @@
                 bigTitle.textContent = 'Chưa có mã sách';
                 smallTitle.textContent = 'Chưa xác định sách';
                 authorEl.textContent = 'Đang cập nhật';
-                summary.textContent =
-                    'Không tìm thấy mã sách trên URL. ' +
-                    'Hãy mở trang này từ một cuốn sách có đường dẫn chứa ?id=...';
+                summary.textContent = 'Không tìm thấy mã sách trên URL.';
                 return;
             }
 
             try {
-                const response = await fetch(
-                    `http://localhost:8000/api/books/${encodeURIComponent(currentBookId)}`
-                );
-
-                if (!response.ok) {
-                    throw new Error(
-                        `Không tìm thấy sách hoặc API trả về lỗi ${response.status}.`
-                    );
-                }
-
+                const response = await fetch(`${API_BASE}/api/books/${encodeURIComponent(currentBookId)}`);
+                if (!response.ok) throw new Error(`Không tìm thấy sách hoặc API trả về lỗi ${response.status}.`);
                 const book = await response.json();
 
-                // Cập nhật tên sách và tác giả.
                 bigTitle.textContent = book.title || `Sách ${currentBookId}`;
                 smallTitle.textContent = book.title || `Sách ${currentBookId}`;
                 authorEl.textContent = book.authors || 'Đang cập nhật';
-
-                // TỰ ĐỘNG CẬP NHẬT ẢNH THEO DỮ LIỆU API.
-                // Không còn cố định ảnh Harry Potter.
                 setBookCover(book.cover_image);
 
-                // Cập nhật nhà xuất bản.
-                publisherEl.innerHTML =
-                    '<i class="fa-solid fa-building"></i> NXB: ' +
-                    (book.publisher || 'Đang cập nhật');
+                publisherEl.innerHTML = '<i class="fa-solid fa-building"></i> NXB: ' + (book.publisher || 'Đang cập nhật');
+                yearEl.innerHTML = '<i class="fa-regular fa-calendar"></i> Năm XB: ' + (book.publication_year || 'Đang cập nhật');
+                pagesEl.innerHTML = '<i class="fa-solid fa-layer-group"></i> ' + (book.num_pages ? `${book.num_pages} Trang` : 'Số trang: Đang cập nhật');
 
-                // Cập nhật năm xuất bản.
-                yearEl.innerHTML =
-                    '<i class="fa-regular fa-calendar"></i> Năm XB: ' +
-                    (book.publication_year || 'Đang cập nhật');
+                currentBookRating = Number(book.rating) || 0;
+                document.getElementById('detailStars').innerHTML = generateStars(currentBookRating);
+                document.getElementById('detailRatingText').textContent = currentBookRating > 0 ? `${currentBookRating.toFixed(1)} / 5` : 'Chưa có điểm đánh giá';
 
-                // Cập nhật số trang.
-                pagesEl.innerHTML =
-                    '<i class="fa-solid fa-layer-group"></i> ' +
-                    (book.num_pages
-                        ? `${book.num_pages} Trang`
-                        : 'Số trang: Đang cập nhật');
-
-                // Cập nhật điểm đánh giá.
-                const rating = Number(book.rating) || 0;
-
-                document.getElementById('detailStars').innerHTML =
-                    generateStars(rating);
-
-                document.getElementById('detailRatingText').textContent =
-                    rating > 0
-                        ? `${rating.toFixed(1)} / 5`
-                        : 'Chưa có điểm đánh giá';
-
-                // Chỉ hiển thị description MỘT LẦN ở mục Tóm tắt sách.
-                const description =
-                    typeof book.description === 'string'
-                        ? book.description.trim()
-                        : '';
-
-                summary.textContent = description ||
-                    'Chưa có tóm tắt cho cuốn sách này trong cơ sở dữ liệu.';
+                const description = typeof book.description === 'string' ? book.description.trim() : '';
+                summary.textContent = description || 'Chưa có tóm tắt cho cuốn sách này trong cơ sở dữ liệu.';
 
             } catch (err) {
                 bigTitle.textContent = `Không tải được sách ${currentBookId}`;
                 smallTitle.textContent = `Mã: ${currentBookId}`;
                 authorEl.textContent = 'Đang cập nhật';
-
-                publisherEl.innerHTML =
-                    '<i class="fa-solid fa-building"></i> NXB: Đang cập nhật';
-
-                yearEl.innerHTML =
-                    '<i class="fa-regular fa-calendar"></i> Năm XB: Đang cập nhật';
-
-                pagesEl.innerHTML =
-                    '<i class="fa-solid fa-layer-group"></i> Số trang: Đang cập nhật';
-
-                document.getElementById('detailStars').innerHTML =
-                    generateStars(0);
-
-                document.getElementById('detailRatingText').textContent =
-                    'Chưa có điểm đánh giá';
-
-                summary.textContent =
-                    err.message +
-                    ' Hãy kiểm tra FastAPI đang chạy và mã sách có tồn tại trong bảng Books.';
+                summary.textContent = err.message;
             }
         }
 
         loadBookDetailFromURL();
 
-        // =========================
-        // 6. CHỨC NĂNG YÊU THÍCH
-        // =========================
+        // =========================================================
+        // 6. CHỨC NĂNG YÊU THÍCH (ĐỒNG BỘ LÊN SERVER)
+        // =========================================================
         const btnFavorite = document.getElementById('btnFavorite');
         const heartIcon = document.getElementById('heartIcon');
 
         function getFavorites() {
-            try {
-                const data = JSON.parse(
-                    localStorage.getItem('my_favorites')
-                );
-
-                return Array.isArray(data) ? data : [];
-            } catch (err) {
-                return [];
-            }
+            try { const data = JSON.parse(localStorage.getItem('my_favorites')); return Array.isArray(data) ? data : []; } 
+            catch (err) { return []; }
         }
 
         let favorites = getFavorites();
-
-        let isFavorited = favorites.some(
-            book => String(book.id) === String(currentBookId)
-        );
+        let isFavorited = favorites.some(book => String(book.id) === String(currentBookId));
 
         function updateFavoriteButton() {
             if (isFavorited) {
                 btnFavorite.classList.add('active');
-                heartIcon.classList.remove('fa-regular');
-                heartIcon.classList.add('fa-solid');
+                heartIcon.classList.remove('fa-regular'); heartIcon.classList.add('fa-solid');
                 btnFavorite.title = 'Xóa khỏi yêu thích';
             } else {
                 btnFavorite.classList.remove('active');
-                heartIcon.classList.remove('fa-solid');
-                heartIcon.classList.add('fa-regular');
+                heartIcon.classList.remove('fa-solid'); heartIcon.classList.add('fa-regular');
                 btnFavorite.title = 'Thêm vào yêu thích';
             }
         }
-
         updateFavoriteButton();
 
-        btnFavorite.addEventListener('click', function () {
-            if (!currentBookId) {
-                alert('Không xác định được mã sách.');
-                return;
-            }
-
+        btnFavorite.addEventListener('click', async function () {
+            if (!currentBookId) return;
+            
             favorites = getFavorites();
-
-            isFavorited = favorites.some(
-                book => String(book.id) === String(currentBookId)
-            );
+            isFavorited = favorites.some(book => String(book.id) === String(currentBookId));
 
             if (isFavorited) {
-                // Nếu đã yêu thích thì xóa khỏi danh sách.
-                favorites = favorites.filter(
-                    book => String(book.id) !== String(currentBookId)
-                );
-
+                favorites = favorites.filter(book => String(book.id) !== String(currentBookId));
                 isFavorited = false;
             } else {
-                // Nếu chưa yêu thích thì thêm vào danh sách.
                 favorites.push({
                     id: currentBookId,
                     title: document.getElementById('smallTitle').innerText,
                     author: document.getElementById('bookAuthor').innerText,
-                    img: document.getElementById('bookCover').src
+                    img: document.getElementById('bookCover').src,
+                    rating: currentBookRating
                 });
-
                 isFavorited = true;
             }
-
-            localStorage.setItem(
-                'my_favorites',
-                JSON.stringify(favorites)
-            );
-
+            
+            // Lưu Local
+            localStorage.setItem('my_favorites', JSON.stringify(favorites));
             updateFavoriteButton();
+
+            // ĐỒNG BỘ LÊN SERVER
+            const userId = localStorage.getItem('user_id');
+            if (userId && userId !== 'guest') {
+                try {
+                    await fetch(`${API_BASE}/api/user/favorites`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, favorites: favorites })
+                    });
+                } catch (e) {
+                    console.warn("Lỗi đồng bộ yêu thích:", e);
+                }
+            }
         });
 
-        // =========================
-        // 7. LỊCH SỬ ĐỌC
-        // =========================
+        // =========================================================
+        // 7. LỊCH SỬ ĐỌC (TÍNH GIỜ 5 PHÚT)
+        // =========================================================
+        let readTimer = null;
+
         document.getElementById('btnRead').addEventListener('click', function () {
-            if (!currentBookId) {
-                alert('Không xác định được mã sách.');
+            if (!currentBookId) return;
+            if (readTimer) {
+                alert('⏳ Bạn đang trong thời gian đọc cuốn sách này. Hệ thống sẽ tự động lưu sau 5 phút!');
                 return;
             }
 
-            let history = [];
+            // Bắt đầu tính giờ
+            alert('📖 Đã mở sách! Hệ thống sẽ tự động lưu vào Lịch sử đọc sau 5 phút nữa. Hãy tiếp tục đọc nhé.');
+            
+            const startTime = Date.now();
+            
+            // Set thời gian 5 phút = 300,000 ms. 
+            // (Nếu bạn muốn test nhanh, hãy đổi 300000 thành 10000 tương đương 10 giây)
+            readTimer = setTimeout(async () => {
+                let history = [];
+                try { const savedHistory = JSON.parse(localStorage.getItem('my_history')); history = Array.isArray(savedHistory) ? savedHistory : []; } 
+                catch (err) { history = []; }
 
-            try {
-                const savedHistory = JSON.parse(
-                    localStorage.getItem('my_history')
-                );
+                const durationMinutes = Math.floor((Date.now() - startTime) / 60000);
 
-                history = Array.isArray(savedHistory) ? savedHistory : [];
-            } catch (err) {
-                history = [];
-            }
+                history = history.filter(book => String(book.id) !== String(currentBookId));
+                history.unshift({
+                    id: currentBookId,
+                    title: document.getElementById('smallTitle').innerText,
+                    author: document.getElementById('bookAuthor').innerText,
+                    img: document.getElementById('bookCover').src,
+                    duration: durationMinutes > 0 ? durationMinutes : 5,
+                    last_read: new Date().toISOString(),
+                    rating: currentBookRating
+                });
 
-            // Xóa bản ghi cũ để đưa cuốn sách vừa đọc lên đầu.
-            history = history.filter(
-                book => String(book.id) !== String(currentBookId)
-            );
+                // Lưu Local
+                localStorage.setItem('my_history', JSON.stringify(history));
 
-            history.unshift({
-                id: currentBookId,
-                title: document.getElementById('smallTitle').innerText,
-                author: document.getElementById('bookAuthor').innerText,
-                img: document.getElementById('bookCover').src,
-                duration: Math.floor(Math.random() * 40) + 10,
-                last_read: new Date().toISOString()
-            });
+                // ĐỒNG BỘ LÊN SERVER
+                const userId = localStorage.getItem('user_id');
+                if (userId && userId !== 'guest') {
+                    try {
+                        await fetch(`${API_BASE}/api/user/history`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId, history: history })
+                        });
+                    } catch (e) {
+                        console.warn("Lỗi đồng bộ lịch sử:", e);
+                    }
+                }
 
-            localStorage.setItem(
-                'my_history',
-                JSON.stringify(history)
-            );
-
-            alert(
-                '📖 Đã mở sách! Hệ thống đã ghi nhận thông tin vào Lịch sử đọc.'
-            );
+                alert('✅ Tuyệt vời! Đã lưu cuốn sách này vào Lịch sử đọc của bạn.');
+                readTimer = null; // Reset lại biến timer
+            }, 300000); // 5 phút
         });
-                // =========================
-        // 8. ĐÁNH GIÁ SÁCH (REVIEWS)
-        // =========================
-        const API_BASE = 'http://localhost:8000';
+
+        // =========================================================
+        // 8. ĐÁNH GIÁ SÁCH (REVIEWS) 
+        // =========================================================
+        function getValidUserId() {
+            const uid = (localStorage.getItem('user_id') || '').trim();
+            if (!uid || uid === 'undefined' || uid === 'null' || uid === 'guest') return null;
+            return uid;
+        }
 
         function renderStars(container, n) {
             container.querySelectorAll('i').forEach((el, i) => {
@@ -930,16 +438,11 @@
             });
         }
 
-        // --- 8a. Chọn sao trên form ---
         const starRating = document.getElementById('starRating');
         if (starRating) {
             starRating.querySelectorAll('i').forEach(star => {
-                star.addEventListener('mouseenter', () => {
-                    renderStars(starRating, Number(star.dataset.value));
-                });
-                star.addEventListener('mouseleave', () => {
-                    renderStars(starRating, Number(starRating.dataset.selected || 0));
-                });
+                star.addEventListener('mouseenter', () => renderStars(starRating, Number(star.dataset.value)));
+                star.addEventListener('mouseleave', () => renderStars(starRating, Number(starRating.dataset.selected || 0)));
                 star.addEventListener('click', () => {
                     const v = Number(star.dataset.value);
                     starRating.dataset.selected = v;
@@ -948,30 +451,22 @@
             });
         }
 
-        // --- 8b. Escape HTML tránh XSS ---
         function escapeHtml(s) {
-            const d = document.createElement('div');
-            d.textContent = s == null ? '' : String(s);
-            return d.innerHTML;
+            const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML;
         }
 
         function formatDate(iso) {
             if (!iso) return '';
-            try { return new Date(iso).toLocaleString('vi-VN'); }
-            catch { return iso; }
+            try { return new Date(iso).toLocaleString('vi-VN'); } catch { return iso; }
         }
 
-        // --- 8c. Load danh sách đánh giá ---
         async function loadReviews() {
             const listEl = document.getElementById('reviewList');
             const countEl = document.getElementById('reviewCount');
             if (!currentBookId) return;
             try {
-                const res = await fetch(
-                    `${API_BASE}/api/books/${encodeURIComponent(currentBookId)}/reviews`
-                );
+                const res = await fetch(`${API_BASE}/api/books/${encodeURIComponent(currentBookId)}/reviews`);
                 const data = await res.json();
-                if (data.error) throw new Error(data.error);
                 const items = data.reviews || [];
                 if (countEl) countEl.textContent = `(${items.length})`;
                 if (items.length === 0) {
@@ -981,10 +476,7 @@
                 listEl.innerHTML = items.map(r => `
                     <div class="review-item">
                         <div class="review-header">
-                            <span class="review-user">
-                                <i class="fa-solid fa-user-circle"></i>
-                                ${escapeHtml(r.username)}
-                            </span>
+                            <span class="review-user"><i class="fa-solid fa-user-circle"></i> ${escapeHtml(r.username)}</span>
                             <span class="review-date">${formatDate(r.created_at)}</span>
                         </div>
                         <div class="review-stars">${generateStars(r.rating)}</div>
@@ -996,15 +488,16 @@
             }
         }
 
-        // --- 8d. Submit đánh giá ---
         const btnSubmitReview = document.getElementById('btnSubmitReview');
         if (btnSubmitReview) {
             btnSubmitReview.addEventListener('click', async () => {
-                const userId = (localStorage.getItem('user_id') || '').trim();
+                const userId = getValidUserId(); 
+                
                 if (!userId) {
                     alert('Vui lòng đăng nhập để đánh giá.');
                     return;
                 }
+                
                 const rating = Number(starRating.dataset.selected || 0);
                 if (rating < 1) {
                     alert('Vui lòng chọn số sao (1-5).');
@@ -1013,7 +506,7 @@
                 const comment = document.getElementById('reviewComment').value.trim();
 
                 btnSubmitReview.disabled = true;
-                btnSubmitReview.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
+                btnSubmitReview.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
                 try {
                     const res = await fetch(`${API_BASE}/api/books/review`, {
@@ -1038,25 +531,26 @@
                     alert('❌ ' + err.message);
                 } finally {
                     btnSubmitReview.disabled = false;
-                    btnSubmitReview.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gửi đánh giá';
+                    btnSubmitReview.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
                 }
             });
         }
 
-        // --- 8e. Ẩn/hiện form đánh giá theo trạng thái đăng nhập ---
         (function initReviewAuth() {
-            const userId = (localStorage.getItem('user_id') || '').trim();
+            const userId = getValidUserId();
             const form = document.getElementById('reviewForm');
             const hint = document.getElementById('reviewLoginHint');
+            
             if (userId && form && hint) {
                 form.style.display = 'block';
                 hint.style.display = 'none';
+            } else {
+                form.style.display = 'none';
+                hint.style.display = 'block';
             }
         })();
 
-        // Khởi động tải đánh giá
         loadReviews();
     </script>
-
 </body>
 </html>

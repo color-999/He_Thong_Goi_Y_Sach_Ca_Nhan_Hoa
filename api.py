@@ -138,6 +138,17 @@ def tim_anh_bia(book_id, title="", image_url=""):
     return "bia_sach/bia_sach_chx_co.png"
 
 
+def get_consistent_rating(book_id, raw_rating=None):
+    if raw_rating is not None:
+        try:
+            val = float(raw_rating)
+            if val > 0:
+                return round(val, 1)
+        except Exception:
+            pass
+    return None
+
+
 # ============================================================
 # 3. CAC MODEL DU LIEU
 # ============================================================
@@ -153,6 +164,12 @@ class UserProfile(BaseModel):
     authors: List[str] = Field(default_factory=list)
     books: List[str] = Field(default_factory=list)
     profile_source: str = "survey"
+    name: str = ""
+    phone: str = ""
+    email: str = ""
+    dob: str = ""
+    gender: str = ""
+    quote: str = ""
 
 
 class FavoriteBook(BaseModel):
@@ -160,6 +177,7 @@ class FavoriteBook(BaseModel):
     title: str = ""
     author: str = ""
     img: str = ""
+    rating: float = 0.0
 
 
 class FavoritesPayload(BaseModel):
@@ -167,9 +185,25 @@ class FavoritesPayload(BaseModel):
     favorites: List[FavoriteBook] = Field(default_factory=list)
 
 
+class HistoryItem(BaseModel):
+    id: str
+    title: str = ""
+    author: str = ""
+    img: str = ""
+    duration: int = 0
+    last_read: str = ""
+    rating: float = 0.0
+
+
+class HistoryPayload(BaseModel):
+    user_id: str
+    history: List[HistoryItem] = Field(default_factory=list)
+
+
 class UserPref(BaseModel):
     user_id: str
     favorite_genres: str = ""
+
 
 class ReviewPayload(BaseModel):
     user_id: str
@@ -181,6 +215,8 @@ class ReviewPayload(BaseModel):
 class ReviewDelete(BaseModel):
     user_id: str
     review_id: int
+
+
 # ============================================================
 # 4. NAP MO HINH GOI Y AI
 # ============================================================
@@ -194,7 +230,6 @@ try:
     tfidf_matrix = joblib.load(BASE_DIR / "tfidf_matrix.pkl")
     df_books = joblib.load(BASE_DIR / "df_books.pkl")
 
-    # SUA: fallback Name/Authors de tranh KeyError neu .pkl chi co title/authors
     if isinstance(df_books, pd.DataFrame) and not df_books.empty:
         if "Name" not in df_books.columns and "title" in df_books.columns:
             df_books["Name"] = df_books["title"]
@@ -351,6 +386,7 @@ def require_admin(
 def ensure_personalization_tables(conn):
     cur = conn.cursor()
 
+    # Bảng Hồ sơ (đã mở rộng thêm các cột thông tin cá nhân)
     cur.execute("""
         IF OBJECT_ID('dbo.UserPreferenceProfiles', 'U') IS NULL
         CREATE TABLE dbo.UserPreferenceProfiles (
@@ -359,10 +395,26 @@ def ensure_personalization_tables(conn):
             authors NVARCHAR(MAX) NOT NULL DEFAULT '[]',
             books NVARCHAR(MAX) NOT NULL DEFAULT '[]',
             profile_source NVARCHAR(30) NOT NULL DEFAULT 'survey',
+            name NVARCHAR(255) DEFAULT '',
+            phone NVARCHAR(50) DEFAULT '',
+            email NVARCHAR(255) DEFAULT '',
+            dob NVARCHAR(50) DEFAULT '',
+            gender NVARCHAR(50) DEFAULT '',
+            quote NVARCHAR(MAX) DEFAULT '',
             updated_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
         )
     """)
+    
+    # Thêm cột nếu bảng đã tồn tại từ phiên bản cũ
+    cols_to_add = [
+        ("name", "NVARCHAR(255)"), ("phone", "NVARCHAR(50)"), 
+        ("email", "NVARCHAR(255)"), ("dob", "NVARCHAR(50)"), 
+        ("gender", "NVARCHAR(50)"), ("quote", "NVARCHAR(MAX)")
+    ]
+    for col, col_type in cols_to_add:
+        cur.execute(f"IF COL_LENGTH('dbo.UserPreferenceProfiles', '{col}') IS NULL ALTER TABLE dbo.UserPreferenceProfiles ADD {col} {col_type} DEFAULT ''")
 
+    # Bảng Yêu thích
     cur.execute("""
         IF OBJECT_ID('dbo.UserFavorites', 'U') IS NULL
         CREATE TABLE dbo.UserFavorites (
@@ -372,7 +424,17 @@ def ensure_personalization_tables(conn):
         )
     """)
 
+    # Bảng Lịch sử đọc
+    cur.execute("""
+        IF OBJECT_ID('dbo.UserReadingHistory', 'U') IS NULL
+        CREATE TABLE dbo.UserReadingHistory (
+            user_id NVARCHAR(100) NOT NULL PRIMARY KEY,
+            history_json NVARCHAR(MAX) NOT NULL DEFAULT '[]',
+            updated_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+        )
+    """)
     conn.commit()
+
 
 def ensure_reviews_table(conn):
     """Tạo bảng Reviews nếu chưa có (đánh giá sách của người dùng)."""
@@ -392,12 +454,13 @@ def ensure_reviews_table(conn):
 
 
 # ============================================================
-# 7. DOC HO SO SO THICH
+# 7. DOC HO SO SO THICH & LICH SU
 # ============================================================
 
 def read_profile(cur, user_id):
     cur.execute("""
-        SELECT genres, authors, books, profile_source, updated_at
+        SELECT genres, authors, books, profile_source, updated_at, 
+               name, phone, email, dob, gender, quote
         FROM dbo.UserPreferenceProfiles
         WHERE user_id = ?
     """, user_id)
@@ -405,39 +468,10 @@ def read_profile(cur, user_id):
     row = cur.fetchone()
 
     if not row:
-        try:
-            cur.execute("""
-                SELECT favorite_genres
-                FROM dbo.UserPreferences
-                WHERE user_id = ?
-            """, user_id)
-
-            legacy = cur.fetchone()
-
-        except Exception:
-            legacy = None
-
-        if legacy and legacy[0]:
-            return {
-                "user_id": user_id,
-                "genres": [
-                    x.strip()
-                    for x in str(legacy[0]).split(",")
-                    if x.strip()
-                ],
-                "authors": [],
-                "books": [],
-                "profile_source": "survey",
-                "updated_at": None
-            }
-
         return {
-            "user_id": user_id,
-            "genres": [],
-            "authors": [],
-            "books": [],
-            "profile_source": None,
-            "updated_at": None
+            "user_id": user_id, "genres": [], "authors": [], "books": [], 
+            "profile_source": None, "updated_at": None,
+            "name": "", "phone": "", "email": "", "dob": "", "gender": "", "quote": ""
         }
 
     def parse_list(value):
@@ -453,13 +487,15 @@ def read_profile(cur, user_id):
         "authors": parse_list(row[1]),
         "books": parse_list(row[2]),
         "profile_source": row[3],
-        "updated_at": row[4].isoformat() if row[4] else None
+        "updated_at": row[4].isoformat() if row[4] else None,
+        "name": row[5] or "",
+        "phone": row[6] or "",
+        "email": row[7] or "",
+        "dob": row[8] or "",
+        "gender": row[9] or "",
+        "quote": row[10] or ""
     }
 
-
-# ============================================================
-# 8. DOC DANH SACH SACH YEU THICH
-# ============================================================
 
 def read_favorites(cur, user_id):
     cur.execute("""
@@ -480,8 +516,27 @@ def read_favorites(cur, user_id):
         return []
 
 
+def read_history(cur, user_id):
+    cur.execute("""
+        SELECT history_json
+        FROM dbo.UserReadingHistory
+        WHERE user_id = ?
+    """, user_id)
+
+    row = cur.fetchone()
+
+    if not row:
+        return []
+
+    try:
+        data = json.loads(row[0] or "[]")
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
 # ============================================================
-# 9. API TRANG CHU
+# 8. API TRANG CHU, TAI KHOAN & HO SO
 # ============================================================
 
 @app.get("/")
@@ -492,34 +547,21 @@ def read_root():
     }
 
 
-# ============================================================
-# 10. API DANG KY
-# ============================================================
-
 @app.post("/api/register")
 def register_user(user: UserAuth):
     try:
         with get_conn() as conn:
             cur = conn.cursor()
 
-            cur.execute(
-                "SELECT username FROM Users WHERE username = ?",
-                user.username
-            )
-
+            cur.execute("SELECT username FROM Users WHERE username = ?", user.username)
             if cur.fetchone():
-                return {
-                    "error": "Ten dang nhap da ton tai! Vui long chon ten khac."
-                }
+                return {"error": "Ten dang nhap da ton tai! Vui long chon ten khac."}
 
             new_id = str(uuid.uuid4())
-
             cur.execute("""
-                INSERT INTO Users
-                    (user_id, username, password_hash, role)
+                INSERT INTO Users (user_id, username, password_hash, role)
                 VALUES (?, ?, ?, ?)
             """, (new_id, user.username, hash_password(user.password), "user"))
-
             conn.commit()
 
         return {
@@ -528,21 +570,15 @@ def register_user(user: UserAuth):
             "username": user.username,
             "role": "user"
         }
-
     except Exception as e:
         return {"error": f"Loi Server: {str(e)}"}
 
-
-# ============================================================
-# 11. API DANG NHAP
-# ============================================================
 
 @app.post("/api/login")
 def login_user(user: UserAuth):
     try:
         with get_conn() as conn:
             cur = conn.cursor()
-
             cur.execute("""
                 SELECT user_id, username, role, password_hash
                 FROM Users
@@ -554,11 +590,7 @@ def login_user(user: UserAuth):
             if row and verify_password(user.password, row[3]):
                 if not str(row[3] or "").startswith(PASSWORD_PREFIX):
                     try:
-                        cur.execute("""
-                            UPDATE Users
-                            SET password_hash = ?
-                            WHERE user_id = ?
-                        """, (hash_password(user.password), row[0]))
+                        cur.execute("UPDATE Users SET password_hash = ? WHERE user_id = ?", (hash_password(user.password), row[0]))
                         conn.commit()
                     except Exception:
                         pass
@@ -574,14 +606,9 @@ def login_user(user: UserAuth):
             }
 
         return {"error": "Sai ten dang nhap hoac mat khau!"}
-
     except Exception as e:
         return {"error": f"Loi Server: {str(e)}"}
 
-
-# ============================================================
-# 12. API LAY HO SO SO THICH
-# ============================================================
 
 @app.get("/api/user/profile/{user_id}")
 def get_user_profile(user_id: str):
@@ -589,37 +616,20 @@ def get_user_profile(user_id: str):
         with get_conn() as conn:
             ensure_personalization_tables(conn)
             profile = read_profile(conn.cursor(), user_id)
-
         return profile
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ============================================================
-# 13. API LUU HO SO SO THICH
-# ============================================================
-
 @app.post("/api/user/profile")
 def save_user_profile(profile: UserProfile):
     if not profile.user_id or profile.user_id == "guest":
-        raise HTTPException(
-            status_code=400,
-            detail="Can dang nhap de luu ho so ca nhan."
-        )
+        raise HTTPException(status_code=400, detail="Can dang nhap de luu ho so ca nhan.")
 
     try:
-        genres = list(dict.fromkeys(
-            x.strip() for x in profile.genres if x and x.strip()
-        ))
-
-        authors = list(dict.fromkeys(
-            x.strip() for x in profile.authors if x and x.strip()
-        ))
-
-        books = list(dict.fromkeys(
-            x.strip() for x in profile.books if x and x.strip()
-        ))
+        genres = list(dict.fromkeys(x.strip() for x in profile.genres if x and x.strip()))
+        authors = list(dict.fromkeys(x.strip() for x in profile.authors if x and x.strip()))
+        books = list(dict.fromkeys(x.strip() for x in profile.books if x and x.strip()))
 
         with get_conn() as conn:
             ensure_personalization_tables(conn)
@@ -627,10 +637,8 @@ def save_user_profile(profile: UserProfile):
 
             cur.execute("""
                 UPDATE dbo.UserPreferenceProfiles
-                SET genres = ?,
-                    authors = ?,
-                    books = ?,
-                    profile_source = ?,
+                SET genres = ?, authors = ?, books = ?, profile_source = ?,
+                    name = ?, phone = ?, email = ?, dob = ?, gender = ?, quote = ?,
                     updated_at = SYSUTCDATETIME()
                 WHERE user_id = ?
             """, (
@@ -638,36 +646,29 @@ def save_user_profile(profile: UserProfile):
                 json.dumps(authors, ensure_ascii=False),
                 json.dumps(books, ensure_ascii=False),
                 profile.profile_source,
+                profile.name, profile.phone, profile.email, profile.dob, profile.gender, profile.quote,
                 profile.user_id
             ))
 
             if cur.rowcount == 0:
                 cur.execute("""
                     INSERT INTO dbo.UserPreferenceProfiles
-                        (user_id, genres, authors, books, profile_source)
-                    VALUES (?, ?, ?, ?, ?)
+                        (user_id, genres, authors, books, profile_source, name, phone, email, dob, gender, quote)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     profile.user_id,
                     json.dumps(genres, ensure_ascii=False),
                     json.dumps(authors, ensure_ascii=False),
                     json.dumps(books, ensure_ascii=False),
-                    profile.profile_source
+                    profile.profile_source,
+                    profile.name, profile.phone, profile.email, profile.dob, profile.gender, profile.quote
                 ))
 
+            # Đồng bộ thể loại với bảng cũ (nếu có)
             try:
-                cur.execute("""
-                    UPDATE dbo.UserPreferences
-                    SET favorite_genres = ?
-                    WHERE user_id = ?
-                """, (", ".join(genres), profile.user_id))
-
+                cur.execute("UPDATE dbo.UserPreferences SET favorite_genres = ? WHERE user_id = ?", (", ".join(genres), profile.user_id))
                 if cur.rowcount == 0:
-                    cur.execute("""
-                        INSERT INTO dbo.UserPreferences
-                            (user_id, favorite_genres)
-                        VALUES (?, ?)
-                    """, (profile.user_id, ", ".join(genres)))
-
+                    cur.execute("INSERT INTO dbo.UserPreferences (user_id, favorite_genres) VALUES (?, ?)", (profile.user_id, ", ".join(genres)))
             except Exception:
                 pass
 
@@ -683,47 +684,28 @@ def save_user_profile(profile: UserProfile):
                 "profile_source": profile.profile_source
             }
         }
-
     except HTTPException:
         raise
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# ============================================================
-# 14. API LUU SO THICH THEO DINH DANG CU
-# ============================================================
 
 @app.post("/api/user/preferences")
 def save_legacy_preferences(pref: UserPref):
     return save_user_profile(
         UserProfile(
             user_id=pref.user_id,
-            genres=[
-                x.strip()
-                for x in pref.favorite_genres.split(",")
-                if x.strip()
-            ],
+            genres=[x.strip() for x in pref.favorite_genres.split(",") if x.strip()],
             profile_source="survey"
         )
     )
 
 
-# ============================================================
-# 15. API KIEM TRA DA CO SO THICH HAY CHUA
-# ============================================================
-
 @app.get("/api/user/preferences/{user_id}")
 def check_user_preferences(user_id: str):
     profile = get_user_profile(user_id)
-
     return {
-        "has_preferences": bool(
-            profile.get("genres")
-            or profile.get("authors")
-            or profile.get("books")
-        ),
+        "has_preferences": bool(profile.get("genres") or profile.get("authors") or profile.get("books")),
         "genres": profile.get("genres", []),
         "authors": profile.get("authors", []),
         "books": profile.get("books", []),
@@ -731,53 +713,78 @@ def check_user_preferences(user_id: str):
     }
 
 
-# ============================================================
-# 16. API DONG BO SACH YEU THICH
-# ============================================================
-
+# --- API YÊU THÍCH ---
 @app.post("/api/user/favorites")
 def save_favorites(payload: FavoritesPayload):
     if not payload.user_id or payload.user_id == "guest":
-        raise HTTPException(
-            status_code=400,
-            detail="Can dang nhap de dong bo yeu thich."
-        )
+        raise HTTPException(status_code=400, detail="Can dang nhap de dong bo yeu thich.")
 
     try:
-        data = [
-            item.model_dump()
-            if hasattr(item, "model_dump")
-            else item.dict()
-            for item in payload.favorites
-        ]
-
+        data = [item.model_dump() if hasattr(item, "model_dump") else item.dict() for item in payload.favorites]
         with get_conn() as conn:
             ensure_personalization_tables(conn)
             cur = conn.cursor()
-
             encoded = json.dumps(data, ensure_ascii=False)
 
             cur.execute("""
                 UPDATE dbo.UserFavorites
-                SET favorites_json = ?,
-                    updated_at = SYSUTCDATETIME()
+                SET favorites_json = ?, updated_at = SYSUTCDATETIME()
                 WHERE user_id = ?
             """, (encoded, payload.user_id))
 
             if cur.rowcount == 0:
-                cur.execute("""
-                    INSERT INTO dbo.UserFavorites
-                        (user_id, favorites_json)
-                    VALUES (?, ?)
-                """, (payload.user_id, encoded))
-
+                cur.execute("INSERT INTO dbo.UserFavorites (user_id, favorites_json) VALUES (?, ?)", (payload.user_id, encoded))
             conn.commit()
 
-        return {
-            "message": "Da dong bo yeu thich",
-            "count": len(data)
-        }
+        return {"message": "Da dong bo yeu thich", "count": len(data)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.get("/api/user/favorites/{user_id}")
+def get_user_favorites(user_id: str):
+    try:
+        with get_conn() as conn:
+            ensure_personalization_tables(conn)
+            return {"favorites": read_favorites(conn.cursor(), user_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- API LỊCH SỬ ĐỌC ---
+@app.post("/api/user/history")
+def save_history(payload: HistoryPayload):
+    if not payload.user_id or payload.user_id == "guest":
+        raise HTTPException(status_code=400, detail="Can dang nhap.")
+
+    try:
+        with get_conn() as conn:
+            ensure_personalization_tables(conn)
+            cur = conn.cursor()
+            data = [item.model_dump() for item in payload.history]
+            encoded = json.dumps(data, ensure_ascii=False)
+
+            cur.execute("""
+                UPDATE dbo.UserReadingHistory
+                SET history_json = ?, updated_at = SYSUTCDATETIME()
+                WHERE user_id = ?
+            """, (encoded, payload.user_id))
+
+            if cur.rowcount == 0:
+                cur.execute("INSERT INTO dbo.UserReadingHistory (user_id, history_json) VALUES (?, ?)", (payload.user_id, encoded))
+            conn.commit()
+
+        return {"message": "Đã lưu lịch sử đọc", "count": len(data)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/user/history/{user_id}")
+def get_user_history(user_id: str):
+    try:
+        with get_conn() as conn:
+            ensure_personalization_tables(conn)
+            return {"history": read_history(conn.cursor(), user_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -797,12 +804,10 @@ def get_top_books(limit: int = 15):
                 SELECT TOP {safe_limit}
                     book_id, title, authors, publisher
                 FROM Books
-                """,
-                conn
+                """, conn
             )
 
         return df.to_dict(orient="records")
-
     except Exception as e:
         return {"error": str(e)}
 
@@ -821,36 +826,20 @@ def get_hybrid_recommendations(
 ):
     try:
         if df_books.empty or tfidf_matrix is None or svd_model is None:
-            raise HTTPException(
-                status_code=503,
-                detail="Mo hinh goi y chua duoc nap."
-            )
+            raise HTTPException(status_code=503, detail="Mo hinh goi y chua duoc nap.")
 
         idx_list = df_books.index[
-            df_books["Name"].astype(str).str.lower().str.contains(
-                re.escape(book_name.lower()),
-                na=False
-            )
+            df_books["Name"].astype(str).str.lower().str.contains(re.escape(book_name.lower()), na=False)
         ].tolist()
 
         if not idx_list:
-            return {
-                "error": (
-                    f"Khong tim thay tua sach nao chua tu khoa: {book_name}"
-                )
-            }
+            return {"error": f"Khong tim thay tua sach nao chua tu khoa: {book_name}"}
 
         target_idx = idx_list[0]
-
-        cosine_sim = linear_kernel(
-            tfidf_matrix[target_idx],
-            tfidf_matrix
-        ).flatten()
-
+        cosine_sim = linear_kernel(tfidf_matrix[target_idx], tfidf_matrix).flatten()
         sim_indices = cosine_sim.argsort()[-100:][::-1]
 
         scores = []
-
         for idx in sim_indices:
             book = df_books.iloc[idx]
             b_id = str(book['book_id'])
@@ -866,40 +855,21 @@ def get_hybrid_recommendations(
                 "id": b_id,
                 "Ten sach": b_title,
                 "Tac gia": b_author,
-                "cover_image": tim_anh_bia(
-                    b_id,
-                    b_title,
-                    book.get("image_url", "")
-                ),
-                "rating": get_consistent_rating(
-                    b_id,
-                    book.get("average_rating")
-                ),
+                "cover_image": tim_anh_bia(b_id, b_title, book.get("image_url", "")),
+                "rating": get_consistent_rating(b_id, book.get("average_rating")),
                 "Diem Noi dung": round(float(cosine_sim[idx]), 4),
-                "Diem Hybrid": round(
-                    weight_cb * float(cosine_sim[idx]) + weight_cf * cf,
-                    4
-                )
+                "Diem Hybrid": round(weight_cb * float(cosine_sim[idx]) + weight_cf * cf, 4)
             })
 
-        target = str(
-            df_books.iloc[target_idx]["Name"]
-        ).lower()
-
+        target = str(df_books.iloc[target_idx]["Name"]).lower()
         result = [
-            x for x in sorted(
-                scores,
-                key=lambda x: x["Diem Hybrid"],
-                reverse=True
-            )
+            x for x in sorted(scores, key=lambda x: x["Diem Hybrid"], reverse=True)
             if x["Ten sach"].lower() != target
         ]
 
         return result[:max(1, min(top_n, 50))]
-
     except HTTPException:
         raise
-
     except Exception as e:
         return {"error": str(e)}
 
@@ -909,11 +879,9 @@ def get_hybrid_recommendations(
 # ============================================================
 
 def _translate_genre(g):
-    # Chuyển đổi thể loại tiếng Việt sang tiếng Anh cơ bản nếu cần khớp với dữ liệu dataset
     return str(g or "").strip().lower()
 
 def _strip_paren(author_name):
-    # Loại bỏ năm sinh/năm mất trong ngoặc của tên tác giả nếu có (Ví dụ: "J.K. Rowling (1965-)" -> "J.K. Rowling")
     return re.sub(r'\s*\(.*?\)', '', str(author_name)).strip()
 
 @app.get("/api/recommend/auto")
@@ -922,37 +890,23 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
         with get_conn() as conn:
             ensure_personalization_tables(conn)
             cur = conn.cursor()
-
             profile = read_profile(cur, user_id)
             favorites = read_favorites(cur, user_id)
 
         if df_books.empty:
-            raise HTTPException(
-                status_code=503,
-                detail="Chua nap duoc danh muc sach that (df_books.pkl)."
-            )
+            raise HTTPException(status_code=503, detail="Chua nap duoc danh muc sach that (df_books.pkl).")
 
         genres = profile["genres"]
         authors = profile["authors"]
-        liked_titles = list(profile["books"])
-
-        liked_titles += [
-            str(x.get("title", ""))
-            for x in favorites
-            if x.get("title")
-        ]
+        liked_titles = list(profile["books"]) + [str(x.get("title", "")) for x in favorites if x.get("title")]
 
         if not (genres or authors or liked_titles):
-            return {
-                "error": "Chua co ho so so thich hoac sach yeu thich.",
-                "needs_profile": True
-            }
+            return {"error": "Chua co ho so so thich hoac sach yeu thich.", "needs_profile": True}
 
         def norm(value):
             return str(value or "").casefold()
 
         def _bad_meta(v):
-            # SUA: loai NaN va chuoi rong khoi metadata_text de tranh false-positive
             if v is None:
                 return True
             try:
@@ -969,17 +923,12 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
             author = str(book.get("Authors", book.get("authors", "")))
             book_id = str(book.get("book_id", book.get("id", "")))
 
-            # SUA: bo cot book_id/id/index va bo NaN
             metadata_text = " ".join(
-                norm(v)
-                for col, v in book.to_dict().items()
-                if not _bad_meta(v)
-                and str(col).lower() not in ("book_id", "id", "index")
+                norm(v) for col, v in book.to_dict().items()
+                if not _bad_meta(v) and str(col).lower() not in ("book_id", "id", "index")
             )
 
-            haystack = (
-                title + " " + author + " " + metadata_text
-            ).casefold()
+            haystack = (title + " " + author + " " + metadata_text).casefold()
 
             matched_genres = []
             for g in genres:
@@ -991,40 +940,22 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
             matched_authors = []
             for a in authors:
                 a_clean = _strip_paren(a)
-                if norm(a_clean) and (
-                    norm(a_clean) in norm(author) or norm(author) in norm(a_clean)
-                ):
+                if norm(a_clean) and (norm(a_clean) in norm(author) or norm(author) in norm(a_clean)):
                     matched_authors.append(a_clean)
 
             matched_titles = [
                 t for t in liked_titles
-                if norm(t) and (
-                    norm(t) in norm(title)
-                    or norm(title) in norm(t)
-                )
+                if norm(t) and (norm(t) in norm(title) or norm(title) in norm(t))
             ]
 
             genre_hits = len(matched_genres)
             author_hits = len(matched_authors)
             title_hits = len(matched_titles)
 
-            content_score = (
-                genre_hits * 1.0
-                + author_hits * 2.0
-                + title_hits * 2.5
-            )
+            content_score = (genre_hits * 1.0 + author_hits * 2.0 + title_hits * 2.5)
 
             try:
-                cf_score = (
-                    float(
-                        svd_model.predict(
-                            user_id,
-                            book.get("book_id")
-                        ).est
-                    )
-                    if svd_model is not None
-                    else 0.0
-                )
+                cf_score = float(svd_model.predict(user_id, book.get("book_id")).est) if svd_model is not None else 0.0
             except Exception:
                 cf_score = 0.0
 
@@ -1037,25 +968,16 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
                     continue
 
             reasons = []
-
             if matched_authors:
-                reasons.append(
-                    f"do ban thich tac gia {matched_authors[0]}"
-                )
+                reasons.append(f"do ban thich tac gia {matched_authors[0]}")
             elif matched_genres:
-                reasons.append(
-                    f"phu hop voi the loai {matched_genres[0]}"
-                )
+                reasons.append(f"phu hop voi the loai {matched_genres[0]}")
             elif matched_titles:
                 reasons.append("tuong tu voi sach ban tung thich")
             else:
                 reasons.append("dua tren xu huong cong dong (CF)")
 
-            explanation = (
-                "Goi y nay duoc de xuat "
-                + " va ".join(reasons)
-                + "."
-            )
+            explanation = "Goi y nay duoc de xuat " + " va ".join(reasons) + "."
 
             result.append({
                 "id": str(book_id),
@@ -1069,45 +991,25 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
                 "_avg_rating": book.get("average_rating")
             })
 
-        favorite_ids = {
-            str(x.get("id", ""))
-            for x in favorites
-        }
-
-        result = [
-            x for x in result
-            if x["id"] not in favorite_ids
-        ]
-
-        result.sort(
-            key=lambda x: x["Diem Phu hop (AI)"],
-            reverse=True
-        )
-
+        favorite_ids = {str(x.get("id", "")) for x in favorites}
+        result = [x for x in result if x["id"] not in favorite_ids]
+        result.sort(key=lambda x: x["Diem Phu hop (AI)"], reverse=True)
         top_result = result[:max(1, min(top_n, 50))]
 
         for item in top_result:
-            item["cover_image"] = tim_anh_bia(
-                item["id"],
-                item["Ten sach"],
-                item.pop("_image_url", "")
-            )
-            item["rating"] = get_consistent_rating(
-                item["id"],
-                item.pop("_avg_rating", None)
-            )
+            item["cover_image"] = tim_anh_bia(item["id"], item["Ten sach"], item.pop("_image_url", ""))
+            item["rating"] = get_consistent_rating(item["id"], item.pop("_avg_rating", None))
 
         return top_result
 
     except HTTPException:
         raise
-
     except Exception as e:
         return {"error": str(e)}
 
 
 # ============================================================
-# 20. API THONG KE DASHBOARD
+# 20. API THONG KE DASHBOARD & ADMIN
 # ============================================================
 
 @app.get("/api/admin/dashboard", dependencies=[Depends(require_admin)])
@@ -1115,7 +1017,6 @@ def get_dashboard_stats():
     try:
         with get_conn() as conn:
             cur = conn.cursor()
-
             cur.execute("SELECT COUNT(*) FROM Users")
             users = cur.fetchone()[0]
 
@@ -1130,21 +1031,15 @@ def get_dashboard_stats():
             "total_books": len(df_books),
             "total_reviews": reviews
         }
-
     except Exception as e:
         return {"error": str(e)}
 
-
-# ============================================================
-# 21. API THONG KE QUAN TRI
-# ============================================================
 
 @app.get("/api/admin/stats", dependencies=[Depends(require_admin)])
 def get_admin_stats():
     try:
         with get_conn() as conn:
             cur = conn.cursor()
-
             cur.execute("SELECT COUNT(*) FROM Users")
             total_users = cur.fetchone()[0]
 
@@ -1162,40 +1057,23 @@ def get_admin_stats():
             "total_books": total_books,
             "total_reviews": total_reviews
         }
-
     except Exception as e:
         return {"error": str(e)}
 
-
-# ============================================================
-# 22. API LAY DANH SACH NGUOI DUNG QUAN TRI
-# ============================================================
 
 @app.get("/api/admin/users", dependencies=[Depends(require_admin)])
 def get_admin_users():
     try:
         with get_conn() as conn:
             cur = conn.cursor()
-
-            cur.execute("""
-                SELECT user_id, username, role
-                FROM Users
-            """)
-
+            cur.execute("SELECT user_id, username, role FROM Users")
             users = []
 
             for row in cur.fetchall():
                 u_id = row[0]
-
                 try:
-                    cur.execute("""
-                        SELECT COUNT(*)
-                        FROM UserPreferences
-                        WHERE user_id = ?
-                    """, u_id)
-
+                    cur.execute("SELECT COUNT(*) FROM UserPreferences WHERE user_id = ?", u_id)
                     has_pref = cur.fetchone()[0] > 0
-
                 except Exception:
                     has_pref = False
 
@@ -1207,32 +1085,25 @@ def get_admin_users():
                 })
 
         return {"users": users}
-
     except Exception as e:
         return {"error": str(e)}
 
+
 # ============================================================
-#  API ĐÁNH GIÁ SÁCH (Reviews)
+# 21. API DANH GIA SACH (Reviews)
 # ============================================================
 
 @app.post("/api/books/review")
 def add_or_update_review(payload: ReviewPayload):
-    """Thêm/sửa đánh giá sách. Mỗi user chỉ có 1 review / 1 sách (upsert)."""
     if not payload.user_id or payload.user_id == "guest":
-        raise HTTPException(
-            status_code=400,
-            detail="Can dang nhap de danh gia sach."
-        )
+        raise HTTPException(status_code=400, detail="Can dang nhap de danh gia sach.")
 
     try:
         with get_conn() as conn:
             ensure_reviews_table(conn)
             cur = conn.cursor()
 
-            cur.execute("""
-                SELECT review_id FROM dbo.Reviews
-                WHERE user_id = ? AND book_id = ?
-            """, (payload.user_id, str(payload.book_id)))
+            cur.execute("SELECT review_id FROM dbo.Reviews WHERE user_id = ? AND book_id = ?", (payload.user_id, str(payload.book_id)))
             existing = cur.fetchone()
 
             if existing:
@@ -1246,12 +1117,7 @@ def add_or_update_review(payload: ReviewPayload):
                 cur.execute("""
                     INSERT INTO dbo.Reviews (user_id, book_id, rating, comment)
                     VALUES (?, ?, ?, ?)
-                """, (
-                    payload.user_id,
-                    str(payload.book_id),
-                    float(payload.rating),
-                    payload.comment
-                ))
+                """, (payload.user_id, str(payload.book_id), float(payload.rating), payload.comment))
                 action = "created"
 
             conn.commit()
@@ -1262,7 +1128,6 @@ def add_or_update_review(payload: ReviewPayload):
             "book_id": str(payload.book_id),
             "rating": float(payload.rating)
         }
-
     except HTTPException:
         raise
     except Exception as e:
@@ -1271,7 +1136,6 @@ def add_or_update_review(payload: ReviewPayload):
 
 @app.get("/api/books/{book_id}/reviews")
 def get_book_reviews(book_id: str):
-    """Lấy danh sách đánh giá của một cuốn sách + điểm trung bình cộng đồng."""
     try:
         with get_conn() as conn:
             ensure_reviews_table(conn)
@@ -1305,22 +1169,19 @@ def get_book_reviews(book_id: str):
             "count": len(reviews),
             "reviews": reviews
         }
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.delete("/api/books/review/{review_id}")
 def delete_review(review_id: int, user_id: str):
-    """Xóa đánh giá (chỉ chủ sở hữu hoặc admin)."""
     try:
         with get_conn() as conn:
             ensure_reviews_table(conn)
             cur = conn.cursor()
-            cur.execute("""
-                SELECT user_id FROM dbo.Reviews WHERE review_id = ?
-            """, (review_id,))
+            cur.execute("SELECT user_id FROM dbo.Reviews WHERE review_id = ?", (review_id,))
             row = cur.fetchone()
+
             if not row:
                 raise HTTPException(status_code=404, detail="Khong tim thay danh gia.")
             if str(row[0]) != str(user_id):
@@ -1328,38 +1189,29 @@ def delete_review(review_id: int, user_id: str):
                 adm = cur.fetchone()
                 if not adm or str(adm[0]).lower() != "admin":
                     raise HTTPException(status_code=403, detail="Khong co quyen xoa.")
+
             cur.execute("DELETE FROM dbo.Reviews WHERE review_id = ?", (review_id,))
             conn.commit()
+
         return {"message": "Da xoa danh gia", "review_id": review_id}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
 # ============================================================
-# 23. API LAY CHI TIET MOT CUON SACH
+# 22. API LAY CHI TIET SACH & DANH SACH SACH
 # ============================================================
 
 @app.get("/api/books/{book_id}")
 def get_book_detail(book_id: str):
-    """
-    Lay thong tin chi tiet sach tu SQL Server.
-    Anh bia duoc tim boi ham tim_anh_bia().
-    """
-
     try:
         with get_conn() as conn:
             cur = conn.cursor()
-
             cur.execute("""
-            SELECT
-                book_id,
-                title,
-                authors,
-                publisher,
-                description,
-                average_rating,
-                ratings_count,
-                image_url
+            SELECT book_id, title, authors, publisher, description,
+                   average_rating, ratings_count, image_url
             FROM Books
             WHERE CAST(book_id AS NVARCHAR(100)) = ?
             """, str(book_id))
@@ -1367,10 +1219,7 @@ def get_book_detail(book_id: str):
             row = cur.fetchone()
 
             if not row:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Khong tim thay sach trong co so du lieu."
-                )
+                raise HTTPException(status_code=404, detail="Khong tim thay sach trong co so du lieu.")
 
             book_id_value = str(row[0])
             title = str(row[1] or f"Sach #{book_id_value}")
@@ -1392,26 +1241,11 @@ def get_book_detail(book_id: str):
                 "rating": rating_value,
                 "description": description
             }
-
     except HTTPException:
         raise
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-def get_consistent_rating(book_id, raw_rating=None):
-    if raw_rating is not None:
-        try:
-            val = float(raw_rating)
-            if val > 0:
-                return round(val, 1)
-        except Exception:
-            pass
-    return None
-
-# ============================================================
-# 24. API LAY DANH SACH SACH CHO TRANG CHU
-# ============================================================
 
 @app.get("/api/books")
 def get_all_books():
@@ -1419,15 +1253,13 @@ def get_all_books():
         with get_conn() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT TOP 50
-                book_id, title, authors, publisher, description,
-                average_rating, image_url
-            FROM dbo.Books
+                SELECT TOP 50 book_id, title, authors, publisher, description,
+                       average_rating, image_url
+                FROM dbo.Books
             """)
             rows = cursor.fetchall()
 
         books_list = []
-
         for row in rows:
             book_id = str(row[0])
             title = str(row[1] or f"Sach #{book_id}")
