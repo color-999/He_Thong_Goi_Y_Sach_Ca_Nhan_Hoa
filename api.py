@@ -9,8 +9,6 @@
 # http://localhost:8000/api/books
 # http://localhost:8000/docs
 #
-# Thu muc anh:
-# frontend/bia_sach/
 # ============================================================
 
 from pathlib import Path
@@ -33,11 +31,8 @@ import hashlib
 import secrets
 
 from sklearn.metrics.pairwise import linear_kernel
-
-
 # ============================================================
 # 1. KHOI TAO API
-# ============================================================
 
 app = FastAPI(title="API He Thong Goi Y Sach")
 
@@ -56,10 +51,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
 # ============================================================
 # 2. CAU HINH THU MUC ANH BIA
-# ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
 IMAGE_DIR = BASE_DIR / "frontend" / "bia_sach"
@@ -137,7 +130,6 @@ def tim_anh_bia(book_id, title="", image_url=""):
 
     return "bia_sach/bia_sach_chx_co.png"
 
-
 def get_consistent_rating(book_id, raw_rating=None):
     if raw_rating is not None:
         try:
@@ -148,15 +140,12 @@ def get_consistent_rating(book_id, raw_rating=None):
             pass
     return None
 
-
 # ============================================================
 # 3. CAC MODEL DU LIEU
-# ============================================================
 
 class UserAuth(BaseModel):
     username: str
     password: str
-
 
 class UserProfile(BaseModel):
     user_id: str
@@ -171,7 +160,6 @@ class UserProfile(BaseModel):
     gender: str = ""
     quote: str = ""
 
-
 class FavoriteBook(BaseModel):
     id: str
     title: str = ""
@@ -179,11 +167,9 @@ class FavoriteBook(BaseModel):
     img: str = ""
     rating: float = 0.0
 
-
 class FavoritesPayload(BaseModel):
     user_id: str
     favorites: List[FavoriteBook] = Field(default_factory=list)
-
 
 class HistoryItem(BaseModel):
     id: str
@@ -216,10 +202,8 @@ class ReviewDelete(BaseModel):
     user_id: str
     review_id: int
 
-
 # ============================================================
 # 4. NAP MO HINH GOI Y AI
-# ============================================================
 
 svd_model = None
 tfidf_matrix = None
@@ -278,10 +262,8 @@ def lay_the_loai(book_id):
 
     return THE_LOAI_MAP.get(chuan_hoa_book_id(book_id), [])
 
-
 # ============================================================
 # 5. KET NOI SQL SERVER
-# ============================================================
 
 conn_str = (
     r"DRIVER={ODBC Driver 17 for SQL Server};"
@@ -378,15 +360,13 @@ def require_admin(
 
     return uid
 
-
 # ============================================================
 # 6. TAO CAC BANG CA NHAN HOA NEU CHUA CO
-# ============================================================
 
 def ensure_personalization_tables(conn):
     cur = conn.cursor()
 
-    # Bảng Hồ sơ (đã mở rộng thêm các cột thông tin cá nhân)
+    # Bảng Hồ sơ
     cur.execute("""
         IF OBJECT_ID('dbo.UserPreferenceProfiles', 'U') IS NULL
         CREATE TABLE dbo.UserPreferenceProfiles (
@@ -405,7 +385,7 @@ def ensure_personalization_tables(conn):
         )
     """)
     
-    # Thêm cột nếu bảng đã tồn tại từ phiên bản cũ
+    # nếu bảng đã tồn tại từ phiên bản cũ
     cols_to_add = [
         ("name", "NVARCHAR(255)"), ("phone", "NVARCHAR(50)"), 
         ("email", "NVARCHAR(255)"), ("dob", "NVARCHAR(50)"), 
@@ -452,10 +432,8 @@ def ensure_reviews_table(conn):
     """)
     conn.commit()
 
-
 # ============================================================
 # 7. DOC HO SO SO THICH & LICH SU
-# ============================================================
 
 def read_profile(cur, user_id):
     cur.execute("""
@@ -534,10 +512,8 @@ def read_history(cur, user_id):
     except Exception:
         return []
 
-
 # ============================================================
 # 8. API TRANG CHU, TAI KHOAN & HO SO
-# ============================================================
 
 @app.get("/")
 def read_root():
@@ -712,7 +688,6 @@ def check_user_preferences(user_id: str):
         "profile_source": profile.get("profile_source")
     }
 
-
 # --- API YÊU THÍCH ---
 @app.post("/api/user/favorites")
 def save_favorites(payload: FavoritesPayload):
@@ -788,10 +763,8 @@ def get_user_history(user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ============================================================
-# 17. API LAY SACH NOI BAT
-# ============================================================
+# 9. API LAY SACH NOI BAT
 
 @app.get("/api/books/top")
 def get_top_books(limit: int = 15):
@@ -811,10 +784,8 @@ def get_top_books(limit: int = 15):
     except Exception as e:
         return {"error": str(e)}
 
-
 # ============================================================
-# 18. API GOI Y SACH HYBRID
-# ============================================================
+# 10. API GOI Y SACH HYBRID
 
 @app.get("/api/recommend")
 def get_hybrid_recommendations(
@@ -873,10 +844,8 @@ def get_hybrid_recommendations(
     except Exception as e:
         return {"error": str(e)}
 
-
 # ============================================================
-# 19. API GOI Y SACH TU DONG THEO SO THICH
-# ============================================================
+# 11. API GOI Y SACH TU DONG THEO SO THICH
 
 def _translate_genre(g):
     return str(g or "").strip().lower()
@@ -1009,8 +978,7 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
 
 
 # ============================================================
-# 20. API THONG KE DASHBOARD & ADMIN
-# ============================================================
+# 12. API THONG KE DASHBOARD & ADMIN
 
 @app.get("/api/admin/dashboard", dependencies=[Depends(require_admin)])
 def get_dashboard_stats():
@@ -1090,8 +1058,7 @@ def get_admin_users():
 
 
 # ============================================================
-# 21. API DANH GIA SACH (Reviews)
-# ============================================================
+# 13. API DANH GIA SACH (Reviews)
 
 @app.post("/api/books/review")
 def add_or_update_review(payload: ReviewPayload):
@@ -1199,10 +1166,8 @@ def delete_review(review_id: int, user_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ============================================================
-# 22. API LAY CHI TIET SACH & DANH SACH SACH
-# ============================================================
+# 14. API LAY CHI TIET SACH & DANH SACH SACH
 
 @app.get("/api/books/{book_id}")
 def get_book_detail(book_id: str):
