@@ -78,21 +78,21 @@
                     <i class="fa-solid fa-users stat-icon"></i>
                     <div class="stat-info">
                         <h3>Tổng Người Dùng</h3>
-                        <p>1,245</p>
+                        <p class="stat-value">Đang tải...</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <i class="fa-solid fa-book stat-icon"></i>
                     <div class="stat-info">
                         <h3>Tổng Số Sách</h3>
-                        <p>8,430</p>
+                        <p class="stat-value">Đang tải...</p>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <i class="fa-solid fa-bullseye stat-icon"></i>
+                    <i class="fa-solid fa-comments stat-icon"></i>
                     <div class="stat-info">
-                        <h3>Độ Chính Xác (RMSE)</h3>
-                        <p>0.84</p>
+                        <h3>Tổng Lượt Đánh Giá</h3>
+                        <p class="stat-value">Đang tải...</p>
                     </div>
                 </div>
             </div>
@@ -117,30 +117,15 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>#BK001</td>
-                                <td><img src="bia_sach/Harry_Potter_1.jfif" alt="Bìa" class="table-img"></td>
-                                <td>Harry Potter và Hòn Đá Phù Thủy</td>
-                                <td>J.K. Rowling</td>
-                                <td>Giả tưởng</td>
-                                <td>
-                                    <button class="btn-icon edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#BK002</td>
-                                <td><img src="bia_sach/bia_sach_chx_co.png" alt="Bìa" class="table-img"></td>
-                                <td>Nhà Giả Kim</td>
-                                <td>Paulo Coelho</td>
-                                <td>Triết học</td>
-                                <td>
-                                    <button class="btn-icon edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
-                                </td>
+                                <td colspan="6" style="text-align: center; padding: 20px;">Đang tải dữ liệu sách...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- THANH PHÂN TRANG -->
+                <div id="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;"></div>
+                
             </section>
 
             <!-- 2. QUẢN LÝ NGƯỜI DÙNG -->
@@ -155,28 +140,13 @@
                                 <th>ID</th>
                                 <th>Tên tài khoản</th>
                                 <th>Đã khảo sát</th>
-                                <th>Trạng thái</th>
+                                <th>Quyền</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>#US102</td>
-                                <td>nguyenvana_99</td>
-                                <td><span class="badge success">Đã hoàn thành</span></td>
-                                <td>Hoạt động</td>
-                                <td>
-                                    <button class="btn-action btn-danger">Khóa TK</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#US103</td>
-                                <td>yeudocsach_01</td>
-                                <td><span class="badge warning">Chưa hoàn thành</span></td>
-                                <td>Hoạt động</td>
-                                <td>
-                                    <button class="btn-action btn-danger">Khóa TK</button>
-                                </td>
+                                <td colspan="5" style="text-align: center; padding: 20px;">Đang tải dữ liệu người dùng...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -193,7 +163,7 @@
                     <div class="model-info">
                         <p><strong>Thuật toán đang sử dụng:</strong> SVD (Singular Value Decomposition)</p>
                         <p><strong>Lần huấn luyện cuối:</strong> 16/10/2026 - 02:30 AM</p>
-                        <p><strong>Dữ liệu:</strong> 12,500 lượt đánh giá mới chưa được đưa vào mô hình.</p>
+                        <p><strong>Dữ liệu:</strong> Mô hình sẽ tự động cập nhật khi có đánh giá mới.</p>
                         
                         <div class="metrics-box">
                             <div class="metric">
@@ -256,19 +226,16 @@
         </div>
     </main>
 
-<script>
-                // 0. LẤY THÔNG TIN ADMIN TỪ localStorage (được lưu khi đăng nhập thành công)
-        //    Hỗ trợ nhiều key để tương thích với các phiên bản login.html khác nhau.
+    <script>
+        // 0. LẤY THÔNG TIN ADMIN
         const ADMIN_ID   = (localStorage.getItem('user_id') || '').trim();
         const ADMIN_ROLE = (localStorage.getItem('role')    || '').toLowerCase().trim();
 
-        // Chặn truy cập nếu không phải admin
         if (!ADMIN_ID || ADMIN_ROLE !== 'admin') {
             alert('Bạn cần đăng nhập bằng tài khoản quản trị để vào trang này.');
             window.location.href = 'login.html';
         }
 
-        // Helper: gọi API admin kèm header X-User-Id
         function adminFetch(url, options = {}) {
             const headers = Object.assign(
                 { 'X-User-Id': ADMIN_ID },
@@ -277,7 +244,7 @@
             return fetch(url, { ...options, headers });
         }
 
-        // 1. XỬ LÝ SIDEBAR THU PHÓNG
+        // 1. XỬ LÝ SIDEBAR VÀ CHUYỂN TAB
         const menuBtn = document.getElementById('menu-btn');
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.querySelector('.main-content');
@@ -287,7 +254,6 @@
             mainContent.classList.toggle('expanded');
         });
 
-        // 2. XỬ LÝ CHUYỂN TAB TRONG ADMIN
         const navItems = document.querySelectorAll('.sidebar .nav-list .nav-item a[href^="#"]');
         navItems.forEach(item => {
             item.addEventListener('click', function(e) {
@@ -307,90 +273,145 @@
                 }
             });
         });
-        if(navItems.length > 0) navItems[0].click();
+        if(navItems.length > 0) navItems[0].click(); // Mở Dashboard mặc định
 
-        // 3. TẢI DỮ LIỆU THỐNG KÊ VÀ DANH SÁCH THẬT CHO ADMIN
+        // --- BIẾN TOÀN CỤC CHO PHÂN TRANG ---
+        let allBooksData = []; 
+        let currentPage = 1;
+        const rowsPerPage = 22; // Số sách hiển thị trên mỗi trang
+
+        // 2. TẢI DỮ LIỆU THẬT TỪ API
         async function loadAdminData() {
             try {
-                // Tải thống kê Dashboard (BẮT BUỘC kèm X-User-Id)
+                // --- Tải thống kê ---
                 const resStats = await adminFetch('http://localhost:8000/api/admin/stats');
                 if (!resStats.ok) {
-                    console.warn(`API /api/admin/stats trả ${resStats.status}. Kiểm tra đăng nhập admin.`);
+                    document.querySelectorAll('.stat-value').forEach(el => el.innerText = 'Lỗi quyền');
                 } else {
                     const stats = await resStats.json();
                     if (!stats.error) {
-                        const statCards = document.querySelectorAll('.stat-card p');
-                        if (statCards.length >= 2) {
-                            statCards[0].innerText = Number(stats.total_users).toLocaleString();
-                            statCards[1].innerText = Number(stats.total_books).toLocaleString();
-                        }
+                        const statValues = document.querySelectorAll('.stat-value');
+                        statValues[0].innerText = Number(stats.total_users || 0).toLocaleString('vi-VN');
+                        statValues[1].innerText = Number(stats.total_books || 0).toLocaleString('vi-VN');
+                        statValues[2].innerText = Number(stats.total_reviews || 0).toLocaleString('vi-VN');
                     }
                 }
 
-                // Tải danh sách sách thực tế (endpoint công khai, không cần header)
+                // --- Tải danh sách sách ---
                 const resBooks = await fetch('http://localhost:8000/api/books');
                 const dataBooks = await resBooks.json();
                 if(dataBooks.books) {
-                    const tbodyBook = document.querySelector('#quan-ly-sach tbody');
-                    if(tbodyBook) {
-                        tbodyBook.innerHTML = '';
-                        dataBooks.books.forEach((b, index) => {
-                            tbodyBook.innerHTML += `
+                    allBooksData = dataBooks.books; 
+                    currentPage = 1;
+                    renderBookTable(currentPage); // Gọi hàm vẽ bảng
+                } else {
+                    document.querySelector('#quan-ly-sach tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Không thể tải danh sách sách.</td></tr>';
+                }
+
+                // --- Tải danh sách người dùng ---
+                const resUsers = await adminFetch('http://localhost:8000/api/admin/users');
+                if (resUsers.ok) {
+                    const dataUsers = await resUsers.json();
+                    const tbodyUser = document.querySelector('#quan-ly-user tbody');
+                    if (dataUsers.users && tbodyUser) {
+                        let userHtml = '';
+                        dataUsers.users.forEach((u) => {
+                            const badgeClass = u.survey_completed ? 'success' : 'warning';
+                            const badgeText = u.survey_completed ? 'Đã làm' : 'Chưa làm';
+                            userHtml += `
                                 <tr>
-                                    <td>#BK${b.book_id}</td>
-                                    <td><img src="${b.cover_image}" alt="Bìa" class="table-img" onerror="this.src='bia_sach/bia_sach_chx_co.png'"></td>
-                                    <td>${b.title}</td>
-                                    <td>${b.authors}</td>
-                                    <td>${b.genres ? b.genres.join(', ') : 'Chưa rõ'}</td>
+                                    <td>#US_${String(u.user_id).substring(0,6)}</td>
+                                    <td>${u.username}</td>
+                                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                                    <td>${u.role}</td>
                                     <td>
-                                        <button class="btn-icon edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                                        <button class="btn-icon delete"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="btn-action btn-danger" onclick="alert('Tính năng khóa tài khoản đang phát triển!')">Khóa TK</button>
                                     </td>
                                 </tr>
                             `;
                         });
-                    }
-                }
-
-                 // Tải danh sách người dùng thực tế (BẮT BUỘC kèm X-User-Id)
-                const resUsers = await adminFetch('http://localhost:8000/api/admin/users');
-                if (!resUsers.ok) {
-                    console.warn(`API /api/admin/users trả ${resUsers.status}. Kiểm tra đăng nhập admin.`);
-                } else {
-                    const dataUsers = await resUsers.json();
-                    if (dataUsers.users) {
-                        const tbodyUser = document.querySelector('#quan-ly-user tbody');
-                        if (tbodyUser) {
-                            tbodyUser.innerHTML = '';
-                            dataUsers.users.forEach((u) => {
-                                const badgeClass = u.survey_completed ? 'success' : 'warning';
-                                const badgeText = u.survey_completed ? 'Đã hoàn thành' : 'Chưa hoàn thành';
-                                tbodyUser.innerHTML += `
-                                    <tr>
-                                        <td>#US_${String(u.user_id).substring(0,6)}</td>
-                                        <td>${u.username} (${u.role})</td>
-                                        <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-                                        <td>Hoạt động</td>
-                                        <td>
-                                            <button class="btn-action btn-danger" onclick="alert('Tính năng khóa tài khoản đang phát triển')">Khóa TK</button>
-                                        </td>
-                                    </tr>
-                                `;
-                            });
-                        }
+                        tbodyUser.innerHTML = userHtml;
                     }
                 }
 
             } catch (err) {
-                console.warn("Không thể tải dữ liệu admin từ API:", err);
+                console.error("Lỗi kết nối API:", err);
+                alert("Không thể kết nối đến máy chủ API. Hãy kiểm tra xem file api.py đã chạy chưa!");
             }
         }
 
-        // 4. XỬ LÝ MODAL (POPUP) THÊM SÁCH
+        // --- HÀM VẼ BẢNG SÁCH THEO TRANG ---
+        function renderBookTable(page) {
+            const tbodyBook = document.querySelector('#quan-ly-sach tbody');
+            if (!tbodyBook) return;
+
+            // Tính toán vị trí cắt mảng
+            const startIndex = (page - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const booksToRender = allBooksData.slice(startIndex, endIndex);
+
+            let htmlString = '';
+            booksToRender.forEach((b) => {
+                const genresDisplay = Array.isArray(b.genres) ? b.genres.join(', ') : (b.genres || 'Chưa rõ');
+                htmlString += `
+                    <tr>
+                        <td>#BK${b.book_id}</td>
+                        <td><img src="${b.cover_image}" alt="Bìa" class="table-img" onerror="this.src='bia_sach/bia_sach_chx_co.png'"></td>
+                        <td>${b.title}</td>
+                        <td>${b.authors}</td>
+                        <td>${genresDisplay}</td>
+                        <td>
+                            <button class="btn-icon edit" data-id="${b.book_id}"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-icon delete" data-id="${b.book_id}"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbodyBook.innerHTML = htmlString;
+
+            // Vẽ nút phân trang
+            renderPaginationControls();
+        }
+
+        // --- HÀM VẼ NÚT CHUYỂN TRANG ---
+        function renderPaginationControls() {
+            const paginationContainer = document.getElementById('pagination-controls');
+            if (!paginationContainer) return;
+
+            const totalPages = Math.ceil(allBooksData.length / rowsPerPage);
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = ''; // Không phân trang nếu chỉ có 1 trang
+                return;
+            }
+
+            let buttonsHtml = '';
+
+            // Nút Trang trước
+            buttonsHtml += `<button class="btn-action" ${currentPage === 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="changePage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i> Trang trước</button>`;
+
+            // Hiển thị số trang
+            buttonsHtml += `<span style="display: flex; align-items: center; font-weight: bold; font-size: 15px;">Trang ${currentPage} / ${totalPages}</span>`;
+
+            // Nút Trang sau
+            buttonsHtml += `<button class="btn-action" ${currentPage === totalPages ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="changePage(${currentPage + 1})">Trang sau <i class="fa-solid fa-chevron-right"></i></button>`;
+
+            paginationContainer.innerHTML = buttonsHtml;
+        }
+
+        // Hàm đổi trang (phải gán vào window để onclick gọi được)
+        window.changePage = function(newPage) {
+            currentPage = newPage;
+            renderBookTable(currentPage);
+            // Cuộn lên đầu bảng mượt mà
+            document.getElementById('quan-ly-sach').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        // 3. XỬ LÝ NÚT BẤM KHÁC (SỬA, XÓA, THÊM)
         const btnAddBook = document.querySelector('.btn-add');
         const modalOverlay = document.getElementById('addBookModal');
         const btnClose = document.querySelector('.close-modal');
         const btnCancel = document.querySelector('.btn-cancel');
+        const formAddBook = document.querySelector('.modal-form');
 
         if(btnAddBook) btnAddBook.addEventListener('click', () => { modalOverlay.style.display = 'flex'; });
         const closeModal = () => { if(modalOverlay) modalOverlay.style.display = 'none'; };
@@ -398,7 +419,29 @@
         if(btnCancel) btnCancel.addEventListener('click', closeModal);
         if(modalOverlay) modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
 
-        // 5. NÚT HUẤN LUYỆN MÔ HÌNH
+        if (formAddBook) {
+            formAddBook.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Chức năng thêm sách đang được phát triển!');
+                closeModal();
+            });
+        }
+
+        const bookTable = document.querySelector('#quan-ly-sach tbody');
+        if (bookTable) {
+            bookTable.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-icon.edit')) {
+                    alert('Chức năng chỉnh sửa sách đang phát triển!');
+                }
+                if (e.target.closest('.btn-icon.delete')) {
+                    if (confirm('Bạn có chắc chắn muốn xóa cuốn sách này?')) {
+                        alert('Chức năng xóa sách đang phát triển!');
+                    }
+                }
+            });
+        }
+
+        // 4. NÚT HUẤN LUYỆN MÔ HÌNH
         const btnRetrain = document.getElementById('btnRetrain');
         if(btnRetrain) {
             btnRetrain.addEventListener('click', function() {
@@ -420,7 +463,7 @@
             });
         }
 
-        // Tự động tải dữ liệu khi mở trang quản trị
+        // Khởi chạy khi load trang
         loadAdminData();
     </script>
 
