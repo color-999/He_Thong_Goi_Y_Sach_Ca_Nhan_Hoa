@@ -469,10 +469,7 @@
                 const data = await res.json();
                 const items = data.reviews || [];
                 if (countEl) countEl.textContent = `(${items.length})`;
-                if (items.length === 0) {
-                    listEl.innerHTML = '<div class="review-empty">Chưa có đánh giá nào. Hãy là người đầu tiên!</div>';
-                    return;
-                }
+                
                 listEl.innerHTML = items.map(r => `
                     <div class="review-item">
                         <div class="review-header">

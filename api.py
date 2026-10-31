@@ -1,15 +1,10 @@
-# ============================================================
-# API HE THONG GOI Y SACH
-#
 # Chay API:
 # C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\python.exe -m uvicorn api:app --reload
-#
+
 # Xem API:
 # http://localhost:8000/
 # http://localhost:8000/api/books
 # http://localhost:8000/docs
-#
-# ============================================================
 
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Depends, Header
@@ -229,38 +224,92 @@ except Exception as e:
 
 THE_LOAI_MAP = None
 
+# Quy doi cac nhan the loai tieng Anh/ten khac ve dung nhan tren giao dien.
+THE_LOAI_CHUAN = {
+    "romance": "Lãng mạn", "romantic": "Lãng mạn", "lãng mạn": "Lãng mạn",
+    "self-help": "Kỹ năng", "self help": "Kỹ năng", "personal development": "Kỹ năng", "kỹ năng": "Kỹ năng",
+    "fantasy": "Giả tưởng / Phép thuật", "magic": "Giả tưởng / Phép thuật", "giả tưởng": "Giả tưởng / Phép thuật", "phép thuật": "Giả tưởng / Phép thuật",
+    "business": "Kinh doanh", "economics": "Kinh doanh", "kinh doanh": "Kinh doanh",
+    "science fiction": "Khoa học viễn tưởng", "sci-fi": "Khoa học viễn tưởng", "sci fi": "Khoa học viễn tưởng", "khoa học viễn tưởng": "Khoa học viễn tưởng",
+    "psychology": "Tâm lý", "tâm lý": "Tâm lý",
+    "mystery": "Trinh thám", "detective": "Trinh thám", "crime": "Trinh thám", "trinh thám": "Trinh thám",
+    "biography": "Hồi ký", "memoir": "Hồi ký", "autobiography": "Hồi ký", "hồi ký": "Hồi ký",
+    "thriller": "Kịch tính", "suspense": "Kịch tính", "kịch tính": "Kịch tính",
+    "science": "Khoa học", "khoa học": "Khoa học",
+    "horror": "Kinh dị", "kinh dị": "Kinh dị",
+    "history": "Lịch sử", "lịch sử": "Lịch sử",
+    "adventure": "Phiêu lưu / Hành động", "action": "Phiêu lưu / Hành động", "phiêu lưu": "Phiêu lưu / Hành động", "hành động": "Phiêu lưu / Hành động",
+    "philosophy": "Triết học", "triết học": "Triết học",
+    "historical fiction": "Tiểu thuyết lịch sử", "tiểu thuyết lịch sử": "Tiểu thuyết lịch sử",
+    "health": "Sức khỏe", "fitness": "Sức khỏe", "sức khỏe": "Sức khỏe",
+    "young adult": "Tuổi teen", "teen": "Tuổi teen", "young adult fiction": "Tuổi teen", "tuổi teen": "Tuổi teen",
+    "comics": "Truyện tranh", "graphic novel": "Truyện tranh", "manga": "Truyện tranh", "truyện tranh": "Truyện tranh"
+}
 
-def lay_the_loai(book_id):
+
+def _chuan_hoa_the_loai(value):
+    if value is None:
+        return []
+    if hasattr(value, "__iter__") and not isinstance(value, (str, bytes, dict)):
+        raw_parts = list(value)
+    else:
+        raw_parts = re.split(r"[,;|/]+", str(value))
+
+    result = []
+    for raw in raw_parts:
+        item = str(raw or "").strip().strip("[](){}\"' ")
+        if not item or item.casefold() in ("nan", "none", "<na>"):
+            continue
+        low = item.casefold()
+        matched = next((label for key, label in THE_LOAI_CHUAN.items() if key == low), None)
+        if not matched:
+            matched = item
+        if matched not in result:
+            result.append(matched)
+    return result[:5]
+
+
+def lay_the_loai(book_id, title="", description=""):
     global THE_LOAI_MAP
 
     if THE_LOAI_MAP is None:
         THE_LOAI_MAP = {}
         try:
-            cot = next(
-                (c for c in ["genres", "Genres", "genre", "Genre",
-                             "categories", "Categories", "the_loai"]
-                 if c in df_books.columns),
-                None
-            )
-
-            if cot and "book_id" in df_books.columns:
-                for bid, val in zip(df_books["book_id"], df_books[cot]):
-                    if val is None:
-                        items = []
-                    elif hasattr(val, "__iter__") and not isinstance(val, str):
-                        items = list(val)
-                    elif str(val).lower() == "nan":
-                        items = []
-                    else:
-                        items = re.split(r"[,;|]", str(val))
-
-                    THE_LOAI_MAP[chuan_hoa_book_id(bid)] = [
-                        str(x).strip() for x in items if str(x).strip()
-                    ][:3]
+            cot_id = next((c for c in ["book_id", "id"] if c in df_books.columns), None)
+            cot_genre = next((c for c in ["genres", "Genres", "genre", "Genre", "categories", "Categories", "the_loai", "genre_name"] if c in df_books.columns), None)
+            if cot_id and cot_genre:
+                for bid, val in zip(df_books[cot_id], df_books[cot_genre]):
+                    THE_LOAI_MAP[chuan_hoa_book_id(bid)] = _chuan_hoa_the_loai(val)
         except Exception as e:
             print(f"-> Khong doc duoc the loai tu df_books: {e}")
 
-    return THE_LOAI_MAP.get(chuan_hoa_book_id(book_id), [])
+    genres = THE_LOAI_MAP.get(chuan_hoa_book_id(book_id), [])
+    if genres:
+        return genres
+
+    # Du phong cho sach khong co cot the loai: suy ra tu tieu de/mo ta khi co tu khoa ro rang.
+    text = f"{title or ''} {description or ''}".casefold()
+    keyword_rules = [
+        (["harry potter", "wizard", "wizardry", "magic", "fantasy", "fantastical"], "Giả tưởng / Phép thuật"),
+        (["science fiction", "sci-fi", "space opera", "dystopia"], "Khoa học viễn tưởng"),
+        (["romance", "love story", "romantic"], "Lãng mạn"),
+        (["business", "entrepreneur", "marketing", "management", "investment"], "Kinh doanh"),
+        (["psychology", "psychological"], "Tâm lý"),
+        (["detective", "mystery", "murder", "crime", "sherlock"], "Trinh thám"),
+        (["horror", "haunted", "ghost", "vampire"], "Kinh dị"),
+        (["history", "historical"], "Lịch sử"),
+        (["adventure", "quest", "action"], "Phiêu lưu / Hành động"),
+        (["philosophy", "philosophical"], "Triết học"),
+        (["health", "nutrition", "fitness", "wellness"], "Sức khỏe"),
+        (["comic", "comics", "manga", "graphic novel"], "Truyện tranh"),
+        (["self-help", "self help", "personal development", "habits"], "Kỹ năng"),
+        (["biography", "memoir", "autobiography"], "Hồi ký"),
+        (["teen", "young adult"], "Tuổi teen"),
+        (["thriller", "suspense"], "Kịch tính"),
+        (["science", "scientific"], "Khoa học"),
+    ]
+    inferred = [label for words, label in keyword_rules if any(word in text for word in words)]
+    return list(dict.fromkeys(inferred))[:5]
 
 # ============================================================
 # 5. KET NOI SQL SERVER
@@ -955,6 +1004,7 @@ def get_auto_recommendations(user_id: str, top_n: int = 12):
                 "Diem Phu hop (AI)": round(score, 3),
                 "Diem noi dung": round(content_score, 3),
                 "The loai phu hop": matched_genres,
+                "genres": lay_the_loai(book_id, title, book.get("description", "")),
                 "explanation": explanation,
                 "_image_url": book.get("image_url", ""),
                 "_avg_rating": book.get("average_rating")
@@ -1218,7 +1268,7 @@ def get_all_books():
         with get_conn() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT TOP 50 book_id, title, authors, publisher, description,
+                SELECT book_id, title, authors, publisher, description,
                        average_rating, image_url
                 FROM dbo.Books
             """)
@@ -1240,7 +1290,7 @@ def get_all_books():
                 "title": title,
                 "authors": authors,
                 "publisher": publisher,
-                "genres": lay_the_loai(book_id),
+                "genres": lay_the_loai(book_id, title, description),
                 "cover_image": cover_path,
                 "rating": rating_val,
                 "description": description

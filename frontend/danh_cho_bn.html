@@ -176,22 +176,78 @@
             renderCategories();await loadRecommendations('');
         }
 
+        // Chuẩn hóa tên thể loại để lọc không bị lệch dấu, chữ hoa/thường
+        function normalizeGenre(value) {
+            return String(value ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLocaleLowerCase('vi')
+                .replace(/đ/g, 'd')
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+
+        function getBookGenres(book) {
+            const raw = book['genres']
+                ?? book['genre']
+                ?? book['categories']
+                ?? book['The loai']
+                ?? book['Thể loại']
+                ?? book['The loai phu hop']
+                ?? book['Thể loại phù hợp']
+                ?? [];
+            const values = Array.isArray(raw) ? raw : String(raw).split(/[,;|/]+/);
+            return values.map(g => normalizeGenre(g)).filter(Boolean);
+        }
+
+        function genreMatches(book, selectedGenre) {
+            const selected = normalizeGenre(selectedGenre);
+            const aliases = {
+                'gia tuong phep thuat': ['gia tuong', 'phep thuat', 'fantasy', 'magic'],
+                'gia tuong': ['gia tuong phep thuat', 'fantasy'],
+                'phep thuat': ['gia tuong phep thuat', 'magic'],
+                'phieu luu hanh dong': ['phieu luu', 'hanh dong', 'adventure', 'action'],
+                'khoa hoc vien tuong': ['science fiction', 'sci fi', 'sci-fi', 'scifi'],
+                'lang man': ['romance', 'romantic'],
+                'trinh tham': ['mystery', 'detective', 'crime'],
+                'kinh di': ['horror']
+            };
+            const bookGenres = getBookGenres(book);
+            const accepted = [selected, ...(aliases[selected] || [])];
+            return bookGenres.some(g =>
+                accepted.some(a => g === a || g.includes(a) || a.includes(g))
+            );
+        }
+
         async function loadRecommendations(genre=''){
             if(!autoGrid)return;
             autoGrid.innerHTML='<p class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Đang cá nhân hóa gợi ý...</p>';
+            
             try {
-                const r = await fetch(`${API}/api/recommend/auto?user_id=${encodeURIComponent(userId)}&top_n=30`);
+                let url = `${API}/api/recommend/auto?user_id=${encodeURIComponent(userId)}&top_n=30`;
+                let isFilteringByGenre = false;
+                
+                if (genre) {
+                    url = `${API}/api/books`;
+                    isFilteringByGenre = true;
+                }
+
+                const r = await fetch(url);
                 const data = await r.json();
                 
-                if(!r.ok || data.error || !Array.isArray(data)) {
-                    throw new Error(data.detail || data.error || 'API chưa trả về danh sách sách');
-                }
-                
-                let books = data;
-                if(genre){
-                    books = books.filter(b => (b['The loai phu hop'] || []).some(g =>
-                        String(g).toLocaleLowerCase('vi') === genre.toLocaleLowerCase('vi')
-                    ));
+                let books = [];
+
+                if (isFilteringByGenre) {
+                    // Dữ liệu từ /api/books có dạng { books: [...] }
+                    const allBooks = data.books || [];
+                    books = allBooks.filter(b => genreMatches(b, genre));
+                } else {
+                    // Dữ liệu từ /api/recommend/auto là một mảng
+                    if(!r.ok || data.error || !Array.isArray(data)) {
+                        throw new Error(data.detail || data.error || 'API chưa trả về danh sách sách');
+                    }
+                    books = data;
                 }
                 
                 autoGrid.innerHTML = '';
@@ -201,7 +257,8 @@
                 }
                 
                 books.forEach(book => {
-                    let scoreVal = book['Diem Phu hop (AI)'] ?? book['Điểm Phù hợp (AI)'] ?? book['score'] ?? 0;
+                    // Xử lý linh hoạt cả 2 nguồn API
+                    let scoreVal = book['Diem Phu hop (AI)'] ?? book['Điểm Phù hợp (AI)'] ?? book['score'] ?? (isFilteringByGenre ? 5.0 : 0);
                     let bookName = book['Ten sach'] ?? book['title'] ?? 'Tiêu đề đang cập nhật';
                     let authorName = book['Tac gia'] ?? book['authors'] ?? 'Đang cập nhật';
                     let bookId = book['id'] ?? book['book_id'] ?? '';
@@ -209,8 +266,11 @@
                     let coverImg = book['cover_image'] || book['image_url'] || getCoverPath(book);
                     let explainText = book['explanation'] || '';
 
+                    // Đổi tên nhãn điểm cho phù hợp với chế độ lọc
+                    let scoreText = isFilteringByGenre ? 'Sách cùng thể loại' : 'Điểm phù hợp';
+
                     autoGrid.innerHTML += createBookCardHTML(
-                        bookId, coverImg, bookName, authorName, 'Điểm phù hợp', 
+                        bookId, coverImg, bookName, authorName, scoreText, 
                         Number(scoreVal).toFixed(2), ratingVal, explainText
                     );
                 });

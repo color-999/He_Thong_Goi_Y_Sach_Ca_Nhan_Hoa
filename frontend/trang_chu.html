@@ -151,7 +151,31 @@
 
             // 1. Lọc theo thể loại
             if (activeGenres.length > 0) {
-                filtered = filtered.filter(b => b.genres && b.genres.some(g => activeGenres.includes(g)));
+                const normalizeGenre = value => String(value || '')
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                    .toLocaleLowerCase('vi')
+                    .replace(/\s*\/\s*/g, ' ')
+                    .replace(/[^a-z0-9 ]/g, ' ')
+                    .replace(/\s+/g, ' ').trim();
+
+                filtered = filtered.filter(b => {
+                    const bookGenres = Array.isArray(b.genres) ? b.genres : [];
+                    return bookGenres.some(bookGenre => activeGenres.some(activeGenre => {
+                        const bookValue = normalizeGenre(bookGenre);
+                        const activeValue = normalizeGenre(activeGenre);
+                        if (activeValue === 'gia tuong phep thuat') {
+                            return ['gia tuong phep thuat', 'gia tuong', 'phep thuat', 'fantasy', 'magic'].some(alias => bookValue === normalizeGenre(alias));
+                        }
+                        if (activeValue === 'phieu luu hanh dong') {
+                            return ['phieu luu hanh dong', 'phieu luu', 'hanh dong', 'adventure', 'action'].some(alias => bookValue === normalizeGenre(alias));
+                        }
+                        if (activeValue === 'khoa hoc vien tuong') {
+                            return ['khoa hoc vien tuong', 'science fiction', 'sci fi', 'sci-fi'].some(alias => bookValue === normalizeGenre(alias));
+                        }
+                        return bookValue === activeValue;
+                    }));
+                });
             }
 
             // 2. Lọc theo từ khóa tìm kiếm (Tên sách hoặc Tác giả)
