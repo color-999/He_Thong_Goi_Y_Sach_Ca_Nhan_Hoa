@@ -26,6 +26,8 @@ import hashlib
 import secrets
 
 from sklearn.metrics.pairwise import linear_kernel
+from recommender import get_recommender
+from pydantic import BaseModel
 # ============================================================
 # 1. KHOI TAO API
 
@@ -141,7 +143,7 @@ def get_consistent_rating(book_id, raw_rating=None):
 class UserAuth(BaseModel):
     username: str
     password: str
-
+    contact: Optional[str] = ""
 class UserProfile(BaseModel):
     user_id: str
     genres: List[str] = Field(default_factory=list)
@@ -576,6 +578,7 @@ def read_root():
 def register_user(user: UserAuth):
     try:
         with get_conn() as conn:
+            ensure_personalization_tables(conn) # Đảm bảo bảng đã được tạo
             cur = conn.cursor()
 
             cur.execute("SELECT username FROM Users WHERE username = ?", user.username)
@@ -587,6 +590,16 @@ def register_user(user: UserAuth):
                 INSERT INTO Users (user_id, username, password_hash, role)
                 VALUES (?, ?, ?, ?)
             """, (new_id, user.username, hash_password(user.password), "user"))
+
+            # Xử lý số điện thoại / email
+            contact_val = user.contact.strip() if user.contact else ""
+            phone_val = contact_val if contact_val and "@" not in contact_val else ""
+            email_val = contact_val if contact_val and "@" in contact_val else ""
+             # Tạo sẵn một hồ sơ trống cho user mới, kèm theo sđt/email và tên đăng nhập
+            cur.execute("""
+                INSERT INTO dbo.UserPreferenceProfiles (user_id, name, phone, email)
+                VALUES (?, ?, ?, ?)
+            """, (new_id, user.username, phone_val, email_val))
             conn.commit()
 
         return {
@@ -634,6 +647,69 @@ def login_user(user: UserAuth):
     except Exception as e:
         return {"error": f"Loi Server: {str(e)}"}
 
+
+class ResetPasswordRequest(BaseModel):
+    contact: str # Số điện thoại hoặc email người dùng nhập
+    new_password: str
+
+@app.post("/api/forgot-password/send-otp")
+def send_otp(contact: str):
+    try:
+        with get_conn() as conn:
+            ensure_personalization_tables(conn)
+            cur = conn.cursor()
+            
+            # Kiểm tra xem SĐT/Email này có tồn tại trong hồ sơ không
+            cur.execute("""
+                SELECT user_id FROM dbo.UserPreferenceProfiles 
+                WHERE phone = ? OR email = ?
+            """, (contact, contact))
+            
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản với số điện thoại/email này.")
+            
+            # Ở đây trong thực tế sẽ gọi API gửi SMS. 
+            # Trong đồ án, ta giả lập gửi thành công (OTP mặc định là 123456)
+            return {"message": "Mã OTP đã được gửi (Giả lập: 123456)", "otp_demo": "123456"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/forgot-password/reset")
+def reset_password(payload: ResetPasswordRequest):
+    try:
+        with get_conn() as conn:
+            ensure_personalization_tables(conn)
+            cur = conn.cursor()
+            
+            # Tìm user_id dựa vào SĐT/Email
+            cur.execute("""
+                SELECT user_id FROM dbo.UserPreferenceProfiles 
+                WHERE phone = ? OR email = ?
+            """, (payload.contact, payload.contact))
+            
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản.")
+            
+            user_id = row[0]
+            
+            # Cập nhật lại mật khẩu mới vào bảng Users
+            cur.execute("""
+                UPDATE dbo.Users 
+                SET password_hash = ? 
+                WHERE user_id = ?
+            """, (hash_password(payload.new_password), user_id))
+            
+            conn.commit()
+        return {"message": "Đổi mật khẩu thành công!"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/user/profile/{user_id}")
 def get_user_profile(user_id: str):
@@ -840,58 +916,38 @@ def get_top_books(limit: int = 15):
 def get_hybrid_recommendations(
     user_id: str,
     book_name: str,
-    weight_cb: float = 0.5,
+    weight_cb: float = 0.4,
     weight_cf: float = 0.5,
-    top_n: int = 5
+    top_n: int = 5,
 ):
+    rec = get_recommender()
+    if rec is None:
+        raise HTTPException(status_code=503, detail="Mo hinh goi y chua duoc nap.")
+
     try:
-        if df_books.empty or tfidf_matrix is None or svd_model is None:
-            raise HTTPException(status_code=503, detail="Mo hinh goi y chua duoc nap.")
-
-        idx_list = df_books.index[
-            df_books["Name"].astype(str).str.lower().str.contains(re.escape(book_name.lower()), na=False)
-        ].tolist()
-
-        if not idx_list:
-            return {"error": f"Khong tim thay tua sach nao chua tu khoa: {book_name}"}
-
-        target_idx = idx_list[0]
-        cosine_sim = linear_kernel(tfidf_matrix[target_idx], tfidf_matrix).flatten()
-        sim_indices = cosine_sim.argsort()[-100:][::-1]
-
-        scores = []
-        for idx in sim_indices:
-            book = df_books.iloc[idx]
-            b_id = str(book['book_id'])
-            b_title = str(book['Name'])
-            b_author = str(book.get('Authors', 'Chưa rõ'))
-
-            try: 
-                cf = float(svd_model.predict(user_id, book['book_id']).est) / 5.0
-            except Exception: 
-                cf = 0.0
-
-            scores.append({
-                "id": b_id,
-                "Ten sach": b_title,
-                "Tac gia": b_author,
-                "cover_image": tim_anh_bia(b_id, b_title, book.get("image_url", "")),
-                "rating": get_consistent_rating(b_id, book.get("average_rating")),
-                "Diem Noi dung": round(float(cosine_sim[idx]), 4),
-                "Diem Hybrid": round(weight_cb * float(cosine_sim[idx]) + weight_cf * cf, 4)
-            })
-
-        target = str(df_books.iloc[target_idx]["Name"]).lower()
-        result = [
-            x for x in sorted(scores, key=lambda x: x["Diem Hybrid"], reverse=True)
-            if x["Ten sach"].lower() != target
-        ]
-
-        return result[:max(1, min(top_n, 50))]
-    except HTTPException:
-        raise
+        rows = rec.recommend_similar(
+            book_name=book_name,
+            user_id=user_id,
+            top_n=max(1, min(top_n, 50)),
+            weight_cb=weight_cb,
+            weight_cf=weight_cf,
+        )
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
+
+    if not rows:
+        return {"error": f"Khong tim thay tua sach nao chua tu khoa: {book_name}"}
+
+    # Bổ sung cover + rating
+    for r in rows:
+        r["Ten sach"] = r.pop("title")
+        r["Tac gia"] = r.pop("author")
+        r["Diem Noi dung"] = round(r.pop("cb"), 4)
+        r["Diem CF"] = round(r.pop("cf"), 4)
+        r["Diem Hybrid"] = round(r.pop("score"), 4)
+        r["cover_image"] = tim_anh_bia(r["id"], r["Ten sach"], "")
+        r["rating"] = get_consistent_rating(r["id"])
+    return rows
 
 # ============================================================
 # 11. API GOI Y SACH TU DONG THEO SO THICH

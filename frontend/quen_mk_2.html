@@ -21,7 +21,7 @@
                 <form class="reset-password-form">
                     <div class="input-wrapper">
                         <div class="input-group password-group">
-                            <input type="password" placeholder="Nhập mật khẩu mới" required>
+                            <input type="password" id="new_pass" placeholder="Nhập mật khẩu mới" required>
                             <button type="button" class="toggle-password">
                                 <img src="icon/Eye.svg" width="20" height="20">
                             </button>
@@ -30,7 +30,7 @@
 
                     <div class="input-wrapper">
                         <div class="input-group password-group">
-                            <input type="password" placeholder="Nhập lại mật khẩu mới" required>
+                            <input type="password" id="new_pass_confirm" placeholder="Nhập lại mật khẩu mới" required>
                             <button type="button" class="toggle-password">
                                 <img src="icon/Eye.svg" width="20" height="20">
                             </button>
@@ -38,7 +38,7 @@
                     </div>
                     
                     <div class="btn-container">
-                        <button type="button" class="btn-continue" onclick="window.location.href='login.html'">Tiếp tục</button>
+                        <button type="button" class="btn-continue" id="btnResetPass">Tiếp tục</button>
                     </div>
                 </form>
             </div>
@@ -54,6 +54,56 @@
                 pwdInput.setAttribute('type', type);
                 this.querySelector('img').src = type === 'text' ? 'icon/Eye off.svg' : 'icon/Eye.svg';
             });
+        });
+
+        // Xử lý nút Đổi Mật Khẩu
+        document.getElementById('btnResetPass').addEventListener('click', async function() {
+            const newPass = document.getElementById('new_pass').value.trim();
+            const newPassConfirm = document.getElementById('new_pass_confirm').value.trim();
+            const contact = sessionStorage.getItem('reset_contact');
+
+            // Nếu không có contact (người dùng tự ý vào trang này mà không qua bước 1)
+            if (!contact) {
+                alert("Phiên làm việc đã hết hạn hoặc bạn chưa nhập OTP. Vui lòng quay lại bước 1.");
+                window.location.href = 'quen_mk.html';
+                return;
+            }
+
+            if (!newPass || !newPassConfirm) {
+                alert("Vui lòng nhập đầy đủ mật khẩu mới!");
+                return;
+            }
+
+            if (newPass !== newPassConfirm) {
+                alert("Mật khẩu nhập lại không khớp!");
+                return;
+            }
+
+            const btn = this;
+            btn.innerText = "ĐANG XỬ LÝ...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('http://localhost:8000/api/forgot-password/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact: contact, new_password: newPass })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại bằng mật khẩu mới.");
+                    sessionStorage.removeItem('reset_contact'); // Xóa session
+                    window.location.href = 'login.html';
+                } else {
+                    alert("Lỗi: " + data.detail);
+                }
+            } catch (e) {
+                alert("Lỗi kết nối máy chủ API!");
+            } finally {
+                btn.innerText = "Tiếp tục";
+                btn.disabled = false;
+            }
         });
     </script>
 </body>

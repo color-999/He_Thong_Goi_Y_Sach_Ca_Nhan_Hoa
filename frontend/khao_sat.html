@@ -142,13 +142,14 @@
         const authorInput = document.getElementById('author-search-input');
         const authorList = document.querySelector('.author-list');
 
-        authorInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const authorName = this.value.trim();
-                if (!authorName) return;
-
-                // Kiểm tra xem tác giả này đã có trong danh sách chưa
+        // Hàm xử lý tách chuỗi, thêm tác giả và tự động tick chọn
+        function processAuthorInput(inputStr) {
+            if (!inputStr.trim()) return;
+            
+            // Tách bằng dấu phẩy để hỗ trợ nhập nhiều tác giả cùng lúc (Vd: Vu Triết, Robin Sharma)
+            const authorNames = inputStr.split(',').map(s => s.trim()).filter(Boolean);
+            
+            authorNames.forEach(authorName => {
                 const existingItems = Array.from(authorList.querySelectorAll('.custom-checkbox span'))
                                           .map(s => s.innerText.trim().split(' (')[0].toLowerCase());
                 
@@ -158,14 +159,10 @@
                     newItem.className = 'option-item custom-checkbox';
                     newItem.setAttribute('data-checked', 'true');
                     newItem.innerHTML = `<img src="icon/chon_nhieu.svg" width="18"> <span>${authorName}</span>`;
-                    
-                    // Gắn sự kiện click cho thẻ mới
                     newItem.addEventListener('click', function() { toggleCheckbox(this); });
-                    
-                    // Thêm vào giao diện
                     authorList.appendChild(newItem);
                 } else {
-                    // Nếu đã có sẵn, tự động tick chọn nó
+                    // Nếu đã có sẵn trong danh sách, tự động tick vào
                     const items = authorList.querySelectorAll('.custom-checkbox');
                     for (let item of items) {
                         if (item.querySelector('span').innerText.trim().split(' (')[0].toLowerCase() === authorName.toLowerCase()) {
@@ -175,10 +172,17 @@
                         }
                     }
                 }
-                this.value = ''; // Xóa trống ô nhập liệu sau khi thêm thành công
+            });
+        }
+
+        // Bắt sự kiện ấn Enter trên ô nhập
+        authorInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processAuthorInput(this.value);
+                this.value = ''; // Xóa trống ô nhập
             }
         });
-        // ----------------------------------------
 
         const btnSubmit = document.querySelector('.btn-submit-survey');
         btnSubmit.addEventListener('click', async function(e) {
@@ -186,10 +190,16 @@
             const userId = localStorage.getItem('user_id');
             if (!userId || userId === 'guest') { alert('Vui lòng đăng nhập trước khi lưu khảo sát.'); window.location.href='login.html'; return; }
             
+            // XỬ LÝ QUAN TRỌNG: Nếu người dùng gõ tác giả nhưng quên ấn Enter, tự động thu thập trước khi lưu
+            if (authorInput.value.trim()) {
+                processAuthorInput(authorInput.value);
+                authorInput.value = '';
+            }
+
             const selectedGenres = Array.from(document.querySelectorAll('.genre-grid .custom-checkbox'))
                 .filter(cb => cb.getAttribute('data-checked') === 'true').map(cb => cb.querySelector('span').innerText.trim());
             
-            // Đoạn này sẽ tự động quét cả các checkbox mới được tạo từ ô input
+            // Quét toàn bộ các checkbox tác giả đã được thêm (bao gồm cả tác giả tự nhập)
             const selectedAuthors = Array.from(document.querySelectorAll('.author-list .custom-checkbox'))
                 .filter(cb => cb.getAttribute('data-checked') === 'true').map(cb => cb.querySelector('span').innerText.trim().split(' (')[0]);
             

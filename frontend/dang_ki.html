@@ -97,6 +97,7 @@
         const userInp = document.getElementById('reg_user');
         const passInp = document.getElementById('reg_pass');
         const passConfirmInp = document.getElementById('reg_pass_confirm');
+        const contactInp = document.getElementById('reg_contact');
 
         btnRegister.addEventListener('click', async function() {
             if (!isChecked) {
@@ -107,7 +108,8 @@
             const username = userInp.value.trim();
             const password = passInp.value.trim();
             const passwordConfirm = passConfirmInp.value.trim();
-
+            const contact = contactInp.value.trim();
+            
             if (!username || !password || !passwordConfirm) {
                 alert("❌ Vui lòng điền đủ thông tin tài khoản và mật khẩu!");
                 return;

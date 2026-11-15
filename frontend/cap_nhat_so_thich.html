@@ -91,7 +91,7 @@
         const userId=localStorage.getItem('user_id');
         if(!userId){alert('Vui lòng đăng nhập!');window.location.href='login.html';}
         
-        const allGenres=['Lãng mạn','Kỹ năng','Giả tưởng','Phép thuật','Kinh doanh','Khoa học viễn tưởng','Tâm lý','Trinh thám','Hồi ký','Kịch tính','Khoa học','Kinh dị','Lịch sử','Phiêu lưu','Triết học','Sức khỏe','Tuổi teen','Truyện tranh'];
+        const allGenres=['Lãng mạn','Kỹ năng','Giả tưởng / Phép thuật','Kinh doanh','Khoa học viễn tưởng','Tâm lý','Trinh thám','Hồi ký','Kịch tính','Khoa học','Kinh dị','Lịch sử','Phiêu lưu / Hành động','Triết học','Tiểu thuyết lịch sử','Sức khỏe','Tuổi teen','Truyện tranh'];
         const popularAuthors=['J.K. Rowling','Paulo Coelho','Dan Brown','Agatha Christie','Higashino Keigo','Nguyễn Nhật Ánh','Dale Carnegie','Haruki Murakami','Thích Nhất Hạnh','Pháp y Tần Minh','Stephen King'];
         
         function renderPills(containerId,dataList,savedList,itemType){

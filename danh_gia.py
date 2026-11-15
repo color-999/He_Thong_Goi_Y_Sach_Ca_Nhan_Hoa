@@ -13,7 +13,8 @@ import joblib
 import numpy as np
 import pandas as pd
 from surprise import Dataset, Reader, SVD, KNNBasic, accuracy
-from scipy.stats import rankdata
+from recommender import _rank_norm, HybridRecommender
+# from scipy.stats import rankdata
 
 TRAIN_CSV = 'train_data.csv'
 TEST_CSV = 'test_data.csv'

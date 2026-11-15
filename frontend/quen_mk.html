@@ -22,24 +22,70 @@
                 <form class="forgot-password-form">
                     <div class="input-wrapper">
                         <div class="input-group">
-                            <input type="text" placeholder="Nhập số điện thoại của bạn" required>
+                            <!-- THÊM MỚI: id="forgot_contact" -->
+                            <input type="text" id="forgot_contact" placeholder="Nhập số điện thoại / email của bạn" required>
                         </div>
                     </div>
+                    
+                    <button type="button" id="btnSendOtp" style="margin-bottom: 15px; padding: 10px; background: #FFC0CB; color: #333; border: none; border-radius: 20px; cursor: pointer; width: 100%; font-weight: bold;">Gửi mã OTP</button>
+
                     <p class="instruction-text">Đợi mình chút nhé, mình sẽ gửi OTP về số điện thoại của bạn ngay đây ✧</p>
                     <div class="input-wrapper">
                         <div class="input-group">
-                            <input type="text" placeholder="Nhập mã OTP" required>
+                            
+                            <input type="text" id="forgot_otp" placeholder="Nhập mã OTP" required>
                         </div>
                     </div>
                     
                     <div class="btn-group">
                         <button type="button" class="btn-back" onclick="window.location.href='login.html'">Quay lại</button>
-                        <button type="button" class="btn-continue" onclick="window.location.href='quen_mk_2.html'">Tiếp tục</button>
+                        <button type="button" class="btn-continue" id="btnNextStep">Tiếp tục</button>
                     </div>
                 </form>
             </div>
         </div>
         <div class="footer-text">Mỗi trang sách, một thế giới mới ✿</div>
     </div>
+
+    <script>
+        // 1. Xử lý nút Gửi OTP
+        document.getElementById('btnSendOtp').addEventListener('click', async function() {
+            const contact = document.getElementById('forgot_contact').value.trim();
+            if(!contact) { alert("Vui lòng nhập SĐT hoặc Email!"); return; }
+            
+            try {
+                const res = await fetch(`http://localhost:8000/api/forgot-password/send-otp?contact=${encodeURIComponent(contact)}`, { method: 'POST' });
+                const data = await res.json();
+                
+                if(res.ok) {
+                    alert("Mã OTP đã được gửi! (Mã OTP là: 246790)"); // mã giả lập để test
+                    // Lưu lại SĐT/Email để dùng cho bước sau
+                    sessionStorage.setItem('reset_contact', contact);
+                } else {
+                    alert("Lỗi: " + data.detail);
+                }
+            } catch (e) {
+                alert("Lỗi kết nối máy chủ API!");
+            }
+        });
+
+        // 2. Xử lý nút Tiếp tục
+        document.getElementById('btnNextStep').addEventListener('click', function() {
+            const otp = document.getElementById('forgot_otp').value.trim();
+            const contact = sessionStorage.getItem('reset_contact');
+            
+            if (!contact) {
+                alert("Vui lòng bấm 'Gửi mã OTP' trước!");
+                return;
+            }
+
+            // Kiểm tra mã OTP (giả lập mã đúng là 246790)
+            if (otp === '246790') {
+                window.location.href = 'quen_mk_2.html';
+            } else {
+                alert("Mã OTP không đúng! Vui lòng kiểm tra lại");
+            }
+        });
+    </script>
 </body>
 </html>
