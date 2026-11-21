@@ -28,7 +28,7 @@
 
                     <div class="input-wrapper">
                         <div class="input-group">
-                            <input type="text" id="reg_contact" placeholder="Nhập số điện thoại / email của bạn (Tuỳ chọn)">
+                            <input type="text" id="reg_contact" placeholder="Nhập số điện thoại / email của bạn">
                         </div>
                     </div>
 
@@ -71,78 +71,95 @@
     </div>
     
     <script>
-        // --- 1. XỬ LÝ ẨN/HIỆN MẬT KHẨU ---
-        const toggleBtns = document.querySelectorAll('.toggle-password');
-        toggleBtns.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const pwdInput = this.parentElement.querySelector('input');
-                const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                pwdInput.setAttribute('type', type);
-                
-                this.querySelector('img').src = type === 'text' ? 'icon/Eye off.svg' : 'icon/Eye.svg';
+    // --- 1. XỬ LÝ ẨN/HIỆN MẬT KHẨU ---
+    const toggleBtns = document.querySelectorAll('.toggle-password');
+    toggleBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const pwdInput = this.parentElement.querySelector('input');
+            const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwdInput.setAttribute('type', type);
+            this.querySelector('img').src = type === 'text' ? 'icon/Eye off.svg' : 'icon/Eye.svg';
+        });
+    });
+
+    // --- 2. XỬ LÝ NÚT CHECKBOX ---
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    const checkboxImg = document.getElementById('checkbox-img');
+    let isChecked = false;
+    termsCheckbox.addEventListener('click', function () {
+        isChecked = !isChecked;
+        checkboxImg.src = isChecked ? 'icon/chon_nhieu.svg' : 'icon/chx_chon_nhieu.svg';
+    });
+
+    // --- 3. XỬ LÝ GỌI API ĐĂNG KÝ ---
+    const btnRegister = document.getElementById('btnRegister');
+    const userInp = document.getElementById('reg_user');
+    const passInp = document.getElementById('reg_pass');
+    const passConfirmInp = document.getElementById('reg_pass_confirm');
+    const contactInp = document.getElementById('reg_contact');
+
+    // Kiểm tra định dạng contact: có @ -> email, ngược lại -> số điện thoại
+    function validateContact(contact) {
+        if (!contact) return true; // optional
+        if (contact.includes('@')) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact);
+        }
+        return /^[0-9+\-\s().]{8,15}$/.test(contact);
+    }
+
+    btnRegister.addEventListener('click', async function () {
+        if (!isChecked) {
+            alert("❌ Bạn phải đồng ý với Điều khoản sử dụng!");
+            return;
+        }
+
+        const username        = userInp.value.trim();
+        const password        = passInp.value.trim();
+        const passwordConfirm = passConfirmInp.value.trim();
+        const contact         = contactInp.value.trim();   // lấy dữ liệu SĐT/Email
+
+        if (!username || !password || !passwordConfirm) {
+            alert("❌ Vui lòng điền đủ thông tin tài khoản và mật khẩu!");
+            return;
+        }
+        if (password !== passwordConfirm) {
+            alert("❌ Mật khẩu nhập lại không khớp!");
+            return;
+        }
+        if (!validateContact(contact)) {
+            alert("❌ Số điện thoại / Email không hợp lệ!");
+            return;
+        }
+
+        btnRegister.innerText = "ĐANG TẠO...";
+
+        try {
+            const response = await fetch("http://localhost:8000/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    contact:  contact
+                })
             });
-        });
-        
-        // --- 2. XỬ LÝ NÚT CHECKBOX ---
-        const termsCheckbox = document.getElementById('terms-checkbox');
-        const checkboxImg = document.getElementById('checkbox-img');
-        let isChecked = false;
-        termsCheckbox.addEventListener('click', function() {
-            isChecked = !isChecked;
-            checkboxImg.src = isChecked ? 'icon/chon_nhieu.svg' : 'icon/chx_chon_nhieu.svg';
-        });
 
-        // --- 3. XỬ LÝ GỌI API ĐĂNG KÝ ---
-        const btnRegister = document.getElementById('btnRegister');
-        const userInp = document.getElementById('reg_user');
-        const passInp = document.getElementById('reg_pass');
-        const passConfirmInp = document.getElementById('reg_pass_confirm');
-        const contactInp = document.getElementById('reg_contact');
+            const data = await response.json();
 
-        btnRegister.addEventListener('click', async function() {
-            if (!isChecked) {
-                alert("❌ Bạn phải đồng ý với Điều khoản sử dụng!");
-                return;
+            if (data.error) {
+                alert("❌ Lỗi: " + data.error);
+            } else {
+                // Lưu tạm để trang login / profile có thể dùng nếu cần
+                localStorage.setItem('username', data.username);
+                alert("✅ Đăng ký thành công! Đăng nhập để tiếp tục tìm hiểu những cuốn sách hay nhé.");
+                window.location.href = 'login.html';
             }
-
-            const username = userInp.value.trim();
-            const password = passInp.value.trim();
-            const passwordConfirm = passConfirmInp.value.trim();
-            const contact = contactInp.value.trim();
-            
-            if (!username || !password || !passwordConfirm) {
-                alert("❌ Vui lòng điền đủ thông tin tài khoản và mật khẩu!");
-                return;
-            }
-
-            if (password !== passwordConfirm) {
-                alert("❌ Mật khẩu nhập lại không khớp!");
-                return;
-            }
-
-            btnRegister.innerText = "ĐANG TẠO...";
-            
-            try {
-                const response = await fetch("http://localhost:8000/api/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username: username, password: password })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    alert("❌ Lỗi: " + data.error);
-                } else {
-                    alert("✅ Đăng ký thành công! Đăng nhập để tiếp tục tìm cuốn sách hay nhé.");
-                    window.location.href = 'login.html'; // Tự chuyển về trang đăng nhập
-                }
-            } catch (error) {
-                alert("❌ Lỗi kết nối máy chủ API!");
-            } finally {
-                btnRegister.innerText = "ĐĂNG KÍ";
-            }
-        });
-    </script>
+        } catch (error) {
+            alert("❌ Lỗi kết nối máy chủ API!");
+        } finally {
+            btnRegister.innerText = "ĐĂNG KÍ";
+        }
+    });
+</script>
 </body>
 </html>

@@ -573,33 +573,42 @@ def read_root():
         "personalization": True
     }
 
-
 @app.post("/api/register")
 def register_user(user: UserAuth):
     try:
         with get_conn() as conn:
-            ensure_personalization_tables(conn) # Đảm bảo bảng đã được tạo
+            ensure_personalization_tables(conn)
             cur = conn.cursor()
 
             cur.execute("SELECT username FROM Users WHERE username = ?", user.username)
             if cur.fetchone():
                 return {"error": "Ten dang nhap da ton tai! Vui long chon ten khac."}
 
+            # --- XỬ LÝ PHÂN LOẠI EMAIL / SỐ ĐIỆN THOẠI ---
+            contact_val = str(user.contact).strip() if user.contact else ""
+            phone_val = ""
+            email_val = ""
+            
+            if contact_val:
+                if "@" in contact_val:
+                    email_val = contact_val
+                elif re.match(r"^[0-9\+\-\s\(\)]+$", contact_val):
+                    phone_val = contact_val
+
             new_id = str(uuid.uuid4())
+            
+            # 1. Lưu tài khoản
             cur.execute("""
                 INSERT INTO Users (user_id, username, password_hash, role)
                 VALUES (?, ?, ?, ?)
             """, (new_id, user.username, hash_password(user.password), "user"))
 
-            # Xử lý số điện thoại / email
-            contact_val = user.contact.strip() if user.contact else ""
-            phone_val = contact_val if contact_val and "@" not in contact_val else ""
-            email_val = contact_val if contact_val and "@" in contact_val else ""
-             # Tạo sẵn một hồ sơ trống cho user mới, kèm theo sđt/email và tên đăng nhập
+            # 2. Lưu vào hồ sơ cá nhân (name = username, kèm sđt/email vừa phân loại)
             cur.execute("""
                 INSERT INTO dbo.UserPreferenceProfiles (user_id, name, phone, email)
                 VALUES (?, ?, ?, ?)
             """, (new_id, user.username, phone_val, email_val))
+            
             conn.commit()
 
         return {
@@ -609,7 +618,7 @@ def register_user(user: UserAuth):
             "role": "user"
         }
     except Exception as e:
-        return {"error": f"Loi Server: {str(e)}"}
+        return {"error": f"Loi Server: {str(e)}"} 
 
 
 @app.post("/api/login")
