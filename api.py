@@ -151,8 +151,8 @@ class UserProfile(BaseModel):
     books: List[str] = Field(default_factory=list)
     profile_source: str = "survey"
     name: str = ""
-    phone: str = ""
-    email: str = ""
+    phone: Optional[str] = None
+    email: Optional[str] = None
     dob: str = ""
     gender: str = ""
     quote: str = ""
@@ -592,8 +592,10 @@ def register_user(user: UserAuth):
             if contact_val:
                 if "@" in contact_val:
                     email_val = contact_val
-                elif re.match(r"^[0-9\+\-\s\(\)]+$", contact_val):
+                elif re.match(r"^[0-9\+\-\s\(\)\.]+$", contact_val):
                     phone_val = contact_val
+                else:
+                    return {"error": "So dien thoai / Email khong hop le!"}
 
             new_id = str(uuid.uuid4())
             
@@ -748,7 +750,7 @@ def save_user_profile(profile: UserProfile):
             cur.execute("""
                 UPDATE dbo.UserPreferenceProfiles
                 SET genres = ?, authors = ?, books = ?, profile_source = ?,
-                    name = ?, phone = ?, email = ?, dob = ?, gender = ?, quote = ?,
+                    name = ?, phone = COALESCE(?, phone), email = COALESCE(?, email), dob = ?, gender = ?, quote = ?,
                     updated_at = SYSUTCDATETIME()
                 WHERE user_id = ?
             """, (
@@ -771,7 +773,7 @@ def save_user_profile(profile: UserProfile):
                     json.dumps(authors, ensure_ascii=False),
                     json.dumps(books, ensure_ascii=False),
                     profile.profile_source,
-                    profile.name, profile.phone, profile.email, profile.dob, profile.gender, profile.quote
+                    profile.name, profile.phone or "", profile.email or "", profile.dob, profile.gender, profile.quote
                 ))
 
             # Đồng bộ thể loại với bảng cũ (nếu có)

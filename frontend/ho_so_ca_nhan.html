@@ -151,9 +151,11 @@
         if (!userId) { window.location.href = 'login.html'; }
 
         // 1. TẢI DỮ LIỆU TỪ API
+        let profileLoaded = false; // chỉ gửi phone/email khi đã tải được hồ sơ, tránh ghi đè rỗng
         async function loadProfileData() {
             try {
                 const res = await fetch(`http://localhost:8000/api/user/profile/${encodeURIComponent(userId)}`);
+                if (!res.ok) throw new Error("HTTP " + res.status);
                 const data = await res.json();
                 
                 const finalName = data.name || localStorage.getItem('username') || "Người dùng";
@@ -172,6 +174,7 @@
                 // Đồng bộ lại local để các trang khác dùng nếu cần
                 localStorage.setItem('user_genres', JSON.stringify(data.genres || []));
                 localStorage.setItem('user_authors', JSON.stringify(data.authors || []));
+                profileLoaded = true;
             } catch (e) {
                 console.error("Lỗi tải hồ sơ", e);
                 // Fallback
@@ -217,8 +220,8 @@
             const payload = {
                 user_id: userId,
                 name: document.getElementById('nameText').innerText,
-                phone: document.getElementById('inputPhone').value,
-                email: document.getElementById('inputEmail').value,
+                phone: profileLoaded ? document.getElementById('inputPhone').value : undefined,
+                email: profileLoaded ? document.getElementById('inputEmail').value : undefined,
                 quote: document.getElementById('inputQuote').value,
                 dob: document.getElementById('inputDOB').value,
                 gender: document.getElementById('inputGender').value,
